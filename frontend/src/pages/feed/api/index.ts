@@ -1,16 +1,26 @@
 import { GET } from '@/shared/api';
 
+export interface IPagination {
+  tag: string | null;
+  page: number;
+  limit: number;
+}
+
+export const LIMIT = 20;
+
 class FeedApiService {
-  limit: number = 20
+  getArticles(page: IPagination['page'] = 1, tag?: IPagination['tag'], limit: IPagination['limit'] = LIMIT) {
+    const options = { 
+      params: {
+        query: { 
+          tag: tag ?? undefined, 
+          limit, 
+          offset: limit * (page - 1) 
+        } 
+      } 
+    };
 
-  constructor(limit?: number) {
-    if (limit) {
-      this.limit = limit;
-    }
-  }
-
-  getArticles(tag?: string) {
-    return GET('/articles', { params: { query: { tag } } })
+    return GET('/articles', options)
   }
 
   getTags() {
