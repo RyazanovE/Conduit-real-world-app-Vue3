@@ -1,1 +1,1 @@
-export const backendBaseUrl = "https://api.realworld.io/api";
+export const backendBaseUrl = "https://conduit.productionready.io/api";

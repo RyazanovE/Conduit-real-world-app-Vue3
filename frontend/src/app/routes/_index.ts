@@ -3,7 +3,7 @@ import { FeedPage } from '@/pages/feed'
 
 
 const routes = [
-  { path: '/', component: FeedPage },
+  { path: '/', component: FeedPage, name: 'feed' },
 ]
 
 const router = createRouter({
