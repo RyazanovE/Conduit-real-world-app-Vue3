@@ -7,7 +7,7 @@ interface FetchState<T> {
   fetchData: (...params: any) => Promise<void>
 }
 
-export function useFetch<T>(fetchFunc: (...params: any) => Promise<T>): FetchState<T> {
+export function useFetch<T>(fetchFunc: (...params: any) => Promise<T>, manual = false): FetchState<T> {
   const result: Ref<T | null> = ref(null);
   const error = ref<Error | null>(null);
   const isLoading = ref<boolean>(false);
@@ -24,7 +24,9 @@ export function useFetch<T>(fetchFunc: (...params: any) => Promise<T>): FetchSta
     }
   };
 
-  fetchData();
+  if (!manual) {
+    fetchData();
+  }
 
   return {
     result,
