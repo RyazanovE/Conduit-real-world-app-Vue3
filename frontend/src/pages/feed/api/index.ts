@@ -1,6 +1,7 @@
-import { GET } from '@/shared/api';
+import { api } from '@/app/api/_index';
+import { MultipleArticlesResponse, TagsResponse } from '@/shared/api/models';
 
-export interface IPagination {
+export interface Pagination {
   tag: string | null;
   page: number;
   limit: number;
@@ -9,7 +10,7 @@ export interface IPagination {
 export const LIMIT = 20;
 
 class FeedApiService {
-  getArticles(page: IPagination['page'] = 1, tag?: IPagination['tag'], limit: IPagination['limit'] = LIMIT) {
+  getArticles(page: Pagination['page'] = 1, tag?: Pagination['tag'], limit: Pagination['limit'] = LIMIT) {
     const options = { 
       params: {
         query: { 
@@ -20,11 +21,11 @@ class FeedApiService {
       } 
     };
 
-    return GET('/articles', options)
+    return api.get<MultipleArticlesResponse>('/articles', options)
   }
 
   getTags() {
-    return GET('/tags')
+    return api.get<TagsResponse>('/tags')
   }
 }
 

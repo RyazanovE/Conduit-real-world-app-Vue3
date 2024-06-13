@@ -3,10 +3,10 @@
   import ArticlePreview from './ArticlePreview.vue';
   import { useRoute } from 'vue-router';
   import { computed, ref, watch } from 'vue';
-  import { IPagination, LIMIT, feedApiService } from '../api';
+  import { Pagination, LIMIT, feedApiService } from '../api';
 
   const route = useRoute();
-  const pagination = ref<IPagination>({
+  const pagination = ref<Pagination>({
     tag: null,
     page: 1,
     limit: LIMIT,
