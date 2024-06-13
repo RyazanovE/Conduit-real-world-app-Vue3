@@ -4,6 +4,7 @@
   import { reactive } from 'vue';
   import { useRouter } from 'vue-router';
   import { useCookies } from "vue3-cookies";
+import { setUser } from '@/app/store';
 
   const router = useRouter();
   const { cookies } = useCookies();
@@ -24,6 +25,7 @@
 
   const onSubmit = async (_e: Event) => {
     await fetchData(formValues.username, formValues.password, formValues.email);
+    setUser(registerResult.value?.data.user ?? null)
     const errors = registerResult?.value?.error?.errors;
     const token = registerResult.value?.data?.user.token
 
