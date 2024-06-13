@@ -2,7 +2,7 @@ import axios from 'axios';
 import { backendBaseUrl } from '@/shared/config';
 
 
-const axiosInstance = axios.create({
+const api = axios.create({
   baseURL: backendBaseUrl, 
   timeout: 10000,
   headers: {
@@ -10,7 +10,7 @@ const axiosInstance = axios.create({
   },
 });
 
-axiosInstance.interceptors.request.use(
+api.interceptors.request.use(
   config => {
     return config;
   },
@@ -19,7 +19,7 @@ axiosInstance.interceptors.request.use(
   }
 );
 
-axiosInstance.interceptors.response.use(
+api.interceptors.response.use(
   response => {
     return response;
   },
@@ -28,4 +28,4 @@ axiosInstance.interceptors.response.use(
   }
 );
 
-export default axiosInstance;
+export { api };
