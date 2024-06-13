@@ -31,7 +31,7 @@ const customPOST = (path: PathsWithMethod<paths, 'post'>, options?: any) => {
     params.headers = params.headers || {};
     params.headers.Authorization = `Bearer ${accessToken}`;
   }
-  return POST(path as any, params);
+  return POST(path, params);
 };
 
 
