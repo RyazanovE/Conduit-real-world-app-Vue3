@@ -1,30 +1,40 @@
+import { AxiosError } from 'axios';
 import { ref, Ref } from 'vue';
 
-interface FetchState<T> {
+interface FetchState<T, P extends any[]> {
   result: Ref<T | null>;
-  error: Ref<Error | null>;
+  error: Ref<AxiosError | null>;
   isLoading: Ref<boolean>;
-  fetchData: (...params: any) => Promise<void>
+  isError: Ref<boolean>;
+  fetchData: (...params: P) => Promise<void>;
 }
 
-export function useFetch<T>(fetchFunc: (...params: any) => Promise<T>, manual = false): FetchState<T> {
+export function useFetch<T, P extends unknown[]>(
+  fetchFunc: (...params: P) => Promise<T>,
+  manual = false
+): FetchState<T, P> {
   const result: Ref<T | null> = ref(null);
-  const error = ref<Error | null>(null);
+  const error = ref<AxiosError | null>(null);
   const isLoading = ref<boolean>(false);
+  const isError = ref<boolean>(false);
 
-  const fetchData = async (...args: any[]) => {
+  const fetchData = async (...args: P) => {
     isLoading.value = true;
+    isError.value = false;
+
     try {
       const res = await fetchFunc(...args);
       result.value = res;
     } catch (err) {
-      error.value = err as Error;
+      isError.value = true;
+      error.value = err as AxiosError;
     } finally {
       isLoading.value = false;
     }
   };
 
   if (!manual) {
+    // @ts-ignore
     fetchData();
   }
 
@@ -32,6 +42,7 @@ export function useFetch<T>(fetchFunc: (...params: any) => Promise<T>, manual = 
     result,
     error,
     isLoading,
+    isError,
     fetchData
   };
 }

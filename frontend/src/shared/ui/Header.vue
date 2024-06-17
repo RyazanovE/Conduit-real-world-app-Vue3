@@ -1,17 +1,14 @@
 <script setup lang="ts">
-  import { IUserState } from '@/app/store';
-  import { inject } from 'vue';
-import { useRoute } from 'vue-router';
+  import { useUserSession } from '../hooks';
 
-  const currentUser = inject<IUserState>('userState');
-  const route = useRoute();
-  console.log(currentUser?.user)
+  const { currentUser, route } = useUserSession()
+
 </script>
 
 <template>
   <nav class="navbar navbar-light">
     <div class="container">
-      <router-link class="navbar-brand" to="/" prefetch="intent">
+      <router-link class="navbar-brand" :to="{ name: 'feed' }" prefetch="intent">
         conduit
       </router-link>
       <ul class="nav navbar-nav pull-xs-right">
@@ -30,8 +27,8 @@ import { useRoute } from 'vue-router';
             <router-link
               prefetch="intent"
               class="nav-link"
-              :class="{ active: pathname == '/login' }"
-              to="/login"
+              :class="{ active: route.name == 'login' }"
+              :to="{ name: 'login' }"
             >
               Sign in
             </router-link>
@@ -40,8 +37,8 @@ import { useRoute } from 'vue-router';
             <router-link
               prefetch="intent"
               class="nav-link"
-              :class="{ active: pathname == '/register' }"
-              to="/register"
+              :class="{ active: route.name == 'register' }"
+              :to="{ name: 'register'}"
             >
               Sign up
             </router-link>
@@ -52,7 +49,7 @@ import { useRoute } from 'vue-router';
             <router-link
               prefetch="intent"
               class="nav-link"
-              :class="{ active: pathname == '/editor' }"
+              :class="{ active: route.name == 'editor' }"
               to="/editor"
             >
               <i class="ion-compose"></i>&nbsp;New Article
@@ -62,7 +59,7 @@ import { useRoute } from 'vue-router';
             <router-link
               prefetch="intent"
               class="nav-link"
-              :class="{ active: pathname == '/settings' }"
+              :class="{ active: route.name == 'settings' }"
               to="/settings"
             >
               <i class="ion-gear-a"></i>&nbsp;Settings
@@ -73,18 +70,18 @@ import { useRoute } from 'vue-router';
               prefetch="intent"
               class="nav-link"
               :class="{ active: false }"
-              :to="`/profile/${currentUser.username}`"
+              :to="`/profile/${currentUser?.username}`"
             >
-              <template v-if="currentUser.image">
+              <template v-if="currentUser?.image">
                 <img
                   width="25"
                   height="25"
-                  :src="currentUser.image"
+                  :src="currentUser?.image"
                   class="user-pic"
                   alt=""
                 />
               </template>
-              {{ currentUser.username }}
+              {{ currentUser?.username }}
             </router-link>
           </li>
         </template>

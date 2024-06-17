@@ -4,32 +4,30 @@
   import { reactive } from 'vue';
   import { useRouter } from 'vue-router';
   import { useCookies } from "vue3-cookies";
-import { setUser } from '@/app/store';
+
+  const formFields = [
+    { name: 'email', placeholder: 'Email', type: 'email' },
+    { name: 'password', placeholder: 'Password', type: 'password' },
+  ];
 
   const router = useRouter();
   const { cookies } = useCookies();
-
-  const formFields = [
-      { name: 'email', placeholder: 'Email', type: 'email' },
-      { name: 'password', placeholder: 'Password', type: 'password' },
-    ];
 
   const formValues = reactive({
     password: '',
     email: ''
   })
 
-  const { result: loginResult, fetchData, error } = useFetch((...args) => signInService.login(...args), true)
+  const { result: loginResult, fetchData, error, isError } = useFetch(signInService.login, true)
 
   const onSubmit = async (_e: Event) => {
     await fetchData(formValues.password, formValues.email);
-    setUser(loginResult.value?.data.user ?? null)
-    const errors = loginResult?.value?.error?.errors;
-    const token = loginResult.value?.data?.user.token
+    const user = loginResult.value?.data?.user
+    const token = user?.token
 
-    
-    if (!Object.values(errors ?? {}).length && !error.value) {
+    if (!isError.value && token) {
       cookies.set('token', token)
+      sessionStorage.setItem("user", JSON.stringify(user));
       router.push({ name: 'feed' })
     }
   }
@@ -44,14 +42,27 @@ import { setUser } from '@/app/store';
           <p class="text-xs-center">
             <router-link :to="{ name: 'register' }">Need an account?</router-link>
           </p>
-          <ul v-if="loginResult?.error" class="error-messages">
-            <li 
-              v-for="(value, key) in loginResult.error.errors" 
-              :key="key"
-            >
-              {{ key }}: {{ value }}
-            </li>
-          </ul>
+
+          <template v-if='isError' >
+              <ul 
+                v-if="typeof (error?.response?.data) === 'object'"
+                className="error-messages"
+              >
+                <li 
+                  v-for="(key, value) of (error.response?.data as Record<string, string>)?.errors" 
+                  :key="value"
+                >
+                  {{ value }}: {{ key }}
+                </li>
+              </ul>
+              <p
+                className="error-messages"
+                v-else
+              >
+                {{ error?.response?.data }}
+              </p>
+          </template>
+
           <form @submit.prevent="onSubmit">
             <fieldset 
               v-for="{ name, placeholder, type } in formFields" 

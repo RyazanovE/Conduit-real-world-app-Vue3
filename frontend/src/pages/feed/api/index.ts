@@ -1,5 +1,6 @@
 import { api } from '@/app/api/_index';
-import { MultipleArticlesResponse, TagsResponse } from '@/shared/api/models';
+import { MultipleArticlesResponse, TagsResponse } from '@/pages/feed';
+import { bindAll } from '@/shared/utils';
 
 export interface Pagination {
   tag: string | null;
@@ -10,14 +11,16 @@ export interface Pagination {
 export const LIMIT = 20;
 
 class FeedApiService {
+  constructor() {
+    bindAll(this); 
+  }
+
   getArticles(page: Pagination['page'] = 1, tag?: Pagination['tag'], limit: Pagination['limit'] = LIMIT) {
     const options = { 
       params: {
-        query: { 
-          tag: tag ?? undefined, 
-          limit, 
-          offset: limit * (page - 1) 
-        } 
+        tag: tag ?? undefined, 
+        limit, 
+        offset: limit * (page - 1) 
       } 
     };
 
