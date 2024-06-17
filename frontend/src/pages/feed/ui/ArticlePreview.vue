@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Article } from '@/shared/api';
+import { Article } from '@/pages/sign-in/models';
 import { computed } from 'vue';
 
   interface ArticlePreviewProps {

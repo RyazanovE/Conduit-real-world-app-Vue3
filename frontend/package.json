@@ -12,7 +12,8 @@
     "axios": "^1.7.2",
     "openapi-fetch": "^0.9.7",
     "vue": "^3.4.21",
-    "vue-router": "^4.3.2"
+    "vue-router": "^4.3.2",
+    "vue3-cookies": "^1.0.6"
   },
   "devDependencies": {
     "@types/node": "^20.14.2",
