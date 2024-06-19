@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { useFetch } from '@/shared/hooks';
-  import { LIMIT, feedApiService } from '../api';
+  import { LIMIT, feedApiService } from '..';
   import { useRoute } from 'vue-router';
 
   const route = useRoute();

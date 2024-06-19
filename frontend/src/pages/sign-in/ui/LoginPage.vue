@@ -1,9 +1,8 @@
 <script setup lang="ts">
-  import { useFetch } from '@/shared/hooks';
+  import { useFetch, useUserSession } from '@/shared/hooks';
   import { signInService } from '../api';
   import { reactive } from 'vue';
   import { useRouter } from 'vue-router';
-  import { useCookies } from "vue3-cookies";
 
   const formFields = [
     { name: 'email', placeholder: 'Email', type: 'email' },
@@ -11,7 +10,7 @@
   ];
 
   const router = useRouter();
-  const { cookies } = useCookies();
+  const { setUser } = useUserSession();
 
   const formValues = reactive({
     password: '',
@@ -23,11 +22,9 @@
   const onSubmit = async (_e: Event) => {
     await fetchData(formValues.password, formValues.email);
     const user = loginResult.value?.data?.user
-    const token = user?.token
 
-    if (!isError.value && token) {
-      cookies.set('token', token)
-      sessionStorage.setItem("user", JSON.stringify(user));
+    if (!isError.value && user) {
+      setUser(user)
       router.push({ name: 'feed' })
     }
   }

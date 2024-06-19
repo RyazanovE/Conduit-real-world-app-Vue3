@@ -7,7 +7,7 @@ export const useUserSession = () => {
   const route = useRoute();
 
   const updateUserFromSession = () => {
-    const userData = sessionStorage.getItem('user');
+    const userData = localStorage.getItem('user');
 
     if (userData) {
       const user = JSON.parse(userData);
@@ -15,6 +15,10 @@ export const useUserSession = () => {
     } else {
       currentUser.value = null;
     }
+  }
+
+  const setUser = (user: User) => {
+    localStorage.setItem('user', JSON.stringify(user));
   }
 
   onMounted(() => {
@@ -28,5 +32,6 @@ export const useUserSession = () => {
   return {
     route,
     currentUser,
+    setUser,
   }
 }

@@ -49,7 +49,7 @@
             <router-link
               prefetch="intent"
               class="nav-link"
-              :class="{ active: route.name == 'editor' }"
+              :class="{ active: route.name == 'editor' && !route.params.slug }"
               to="/editor"
             >
               <i class="ion-compose"></i>&nbsp;New Article
