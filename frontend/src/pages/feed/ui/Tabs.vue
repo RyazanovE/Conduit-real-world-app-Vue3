@@ -7,7 +7,7 @@
   const { currentUser, route } = useUserSession()
 
   const navigate = (query?: LocationQueryRaw) => {
-    router.push({ ...route, query: { ...route.query, ...query } });
+    router.push({ ...route, query });
   };
 </script>
 

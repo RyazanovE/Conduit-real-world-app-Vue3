@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import { useFetch } from '@/shared/hooks';
   import ArticlePreview from './ArticlePreview.vue';
-  import { LIMIT, feedApiService } from '../api';
+  import { Article, LIMIT, feedApiService } from '..';
   import PopularTags from './PopularTags.vue';
   import Pagination from './Pagination.vue';
   import { useRoute } from 'vue-router';
@@ -12,13 +12,32 @@
 
   const { result: articlesResult, fetchData: fetchArticles } = useFetch(feedApiService.getArticles, true);
 
+  const updateArticles = () => {
+    fetchArticles(
+      Number(route.query.page ?? 1), 
+      route.query.tag ? String(route.query.tag) : null, 
+      Number(route.query.limit ?? LIMIT), 
+      route.query.source ? String(route.query.source) : undefined
+    )
+  }
+
   onMounted(() => {
-    fetchArticles(Number(route.query.page ?? 1), route.query.tag ? String(route.query.tag) : null, Number(route.query.limit ?? LIMIT))
+    updateArticles();
   })
 
   watch(() => route.query, () => {
-    fetchArticles(Number(route.query.page ?? 1), route.query.tag ? String(route.query.tag) : null, Number(route.query.limit ?? LIMIT))
-  }, {deep: true});
+    updateArticles();
+  }, { deep: true });
+
+  const toggleFavorite = ({slug, favorited}: Partial<Article>) => {
+    const articles = articlesResult.value?.data.articles
+    const index = articles?.findIndex(article => article.slug === slug);
+
+    if (articles && index !== undefined && index !== -1) {
+      articles[index].favorited = !!favorited
+      articles[index].favoritesCount = favorited ? articles[index].favoritesCount + 1 : articles[index].favoritesCount - 1
+    }
+  }
 
 </script>
 
@@ -39,10 +58,9 @@
             v-for="article in articlesResult?.data?.articles" 
             :key="article.slug" 
             :article="article" 
+            @favourited='toggleFavorite'
           />
-          <Pagination 
-            :articles-count='articlesResult?.data.articlesCount' 
-          />
+          <Pagination :articles-count='articlesResult?.data.articlesCount'/>
         </div>
         <div class="col-md-3">
           <PopularTags />

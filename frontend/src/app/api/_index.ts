@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { backendBaseUrl } from '@/shared/config';
-import { useCookies } from 'vue3-cookies';
 import router from '../routes/_index';
 
 const api = axios.create({
@@ -14,14 +13,17 @@ const api = axios.create({
 
 api.interceptors.request.use(
   config => {
-    const { cookies } = useCookies();
-    const token = cookies.get('token');
+    let token = ''
+    const user = localStorage.getItem('user');
 
-    const isAuthPage = config.url && !['/users', '/users/login'].includes(config.url);  
+    if (user) {
+      token = JSON.parse(user).token
+    }
 
-    if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
-    } else if (isAuthPage) {
+    const notAuthPage = config.url && !['/users', '/users/login'].includes(config.url);  
+
+
+    if (notAuthPage && !token) {
       sessionStorage.removeItem("user");
       router.push({ name: 'login'})
       return Promise.reject(new Error('No token available'));
