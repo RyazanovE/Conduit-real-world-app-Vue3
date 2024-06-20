@@ -1,8 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { LoginPage, RegisterPage } from './sign-in';
-import { FeedPage } from './feed';
 import { ArticleReadPage } from '@/pages/article-read';
 import { ArticleEditPage } from '@/pages/article-edit';
+import { Settings } from '@/pages/settings';
+import { FeedPage } from '@/pages/feed';
+import { LoginPage, RegisterPage } from '@/pages/sign-in';
+import { Profile } from '@/pages/profile';
 
 
 const routes = [
@@ -12,6 +14,9 @@ const routes = [
   { path: '/article/:slug', component: ArticleReadPage, name: 'article' },
   { path: '/editor', component: ArticleReadPage, name: 'editor-new' },
   { path: '/editor/:slug?', component: ArticleEditPage, name: 'editor' },
+  { path: '/settings', component: Settings, name: 'settings' },
+  { path: '/profile/:username', component: Profile, name: 'profile' },
+  { path: '/profile/:username/favorites', component: Profile, name: 'profile-favorites' },
 ]
 
 const router = createRouter({

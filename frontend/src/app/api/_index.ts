@@ -19,25 +19,20 @@ api.interceptors.request.use(
     if (user) {
       token = JSON.parse(user).token
     }
+    const noAuthUrls = [
+      '/users', 
+      '/users/login',
+      '/articles',
+      '/tags'
+    ];
+    const isAuthRequired = config.url && !noAuthUrls.includes(config.url);  
 
-    const notAuthPage = config.url && !['/users', '/users/login'].includes(config.url);  
-
-
-    if (notAuthPage && !token) {
+    if (isAuthRequired && !token) {
       sessionStorage.removeItem("user");
       router.push({ name: 'login'})
       return Promise.reject(new Error('No token available'));
     }
     return config;
-  },
-  error => {
-    return Promise.reject(error);
-  }
-);
-
-api.interceptors.response.use(
-  response => {
-    return response;
   },
   error => {
     return Promise.reject(error);
