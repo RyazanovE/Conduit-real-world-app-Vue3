@@ -1,6 +1,5 @@
 import { api } from '@/app/api/_index';
-import { MultipleArticlesResponse, TagsResponse } from '@/pages/feed';
-import { SingleArticleResponse } from '@/shared/models';
+import { MultipleArticlesResponse, SingleArticleResponse, TagsResponse } from '@/shared/models';
 import { bindAll } from '@/shared/utils';
 
 export interface Pagination {
@@ -29,16 +28,18 @@ class FeedApiService {
     return token ? { Authorization: `Token ${token}`} : {}
   }
 
-  getArticles(page: Pagination['page'] = 1, tag?: Pagination['tag'], limit: Pagination['limit'] = LIMIT, source?: Pagination['source']) {
+  getArticles(page: Pagination['page'] = 1, tag?: Pagination['tag'], limit: Pagination['limit'] = LIMIT, source?: Pagination['source'],  author?: string, favorited?: string) {
     const headers = this.getAuthorization();
 
     const options = { 
       params: {
         tag: tag ?? undefined, 
         limit, 
-        offset: limit * (page - 1) 
+        offset: limit * (page - 1), 
+        author, 
+        favorited
       },
-      headers
+      headers,
     };
 
     return api.get<MultipleArticlesResponse>(source === 'my-feed' ? '/articles/feed' : '/articles', options)

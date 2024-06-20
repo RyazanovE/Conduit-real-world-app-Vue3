@@ -39,24 +39,7 @@
 
   const submitForm = async () => {
     try {
-      formErrors.value = [];
-
-      const { title, description, body } = form;
-
-      if (typeof title !== "string" || title === "") {
-        formErrors.value.push("Give this article a title");
-        throw new Error("Give this article a title")
-      }
-
-      if (typeof description !== "string" || description === "") {
-        formErrors.value.push("Describe what this article is about");
-        throw new Error("Describe what this article is about")
-      }
-
-      if (typeof body !== "string" || body === "") {
-        formErrors.value.push("Write the article itself");
-        throw new Error("Write the article itself")
-      }
+      validateForm()
 
       const promise = route.params.slug 
         ? articleReadService.editArticle(String(route.params.slug), form) 
@@ -70,6 +53,28 @@
       console.error('Error submitting form', error);
     }
   };
+
+  const validateForm = () => {
+    formErrors.value = [];
+
+    const { title, description, body } = form;
+
+    if (typeof title !== "string" || title === "") {
+      formErrors.value.push("Give this article a title");
+    }
+
+    if (typeof description !== "string" || description === "") {
+      formErrors.value.push("Describe what this article is about");
+    }
+
+    if (typeof body !== "string" || body === "") {
+      formErrors.value.push("Write the article itself");
+    }
+
+    if (formErrors.value.length > 0) {
+      throw new Error(formErrors.value.join(", "));
+    }
+  }
 </script>
 
 <template>

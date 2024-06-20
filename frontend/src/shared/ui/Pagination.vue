@@ -1,16 +1,15 @@
 <script setup lang="ts">
   import { computed } from 'vue';
-  import { LIMIT } from '../api';
+  import { LIMIT } from '../../pages/feed/api';
   import { useRoute } from 'vue-router';
 
   const route = useRoute();
   
-  const props = defineProps<{ articlesCount?: number }>()
-  const emits = defineEmits((['onPaginationChange']))
+  const props = defineProps<{ pagesAmount?: number, pageName: string }>()
 
   const pages = computed(() => {
-    const articlesCount = props.articlesCount;
-    const length = articlesCount ? Math.ceil(articlesCount / Number(route.query.limit ?? LIMIT)) : 1;
+    const amount = props.pagesAmount;
+    const length = amount ? Math.ceil(amount / Number(route.query.limit ?? LIMIT)) : 1;
 
     return Array.from({ length }, (_, index) => index + 1);
   })
@@ -38,7 +37,7 @@
         >
           <router-link
             class="page-link"
-            :to="{ name: 'feed', query: { ...route.query, page, tag: route.query.tag, limit: route.query.limit ?? LIMIT } }"
+            :to="{ name: props.pageName, query: { ...route.query, page }, params: { ...route.params } }"
           >
             {{ page }}
           </router-link>

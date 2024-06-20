@@ -1,6 +1,6 @@
-import { User } from '@/pages/sign-in';
 import { onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
+import { User } from '../models';
 
 export const useUserSession = () => {
   const currentUser = ref<User | null>(null);
@@ -19,6 +19,11 @@ export const useUserSession = () => {
 
   const setUser = (user: User) => {
     localStorage.setItem('user', JSON.stringify(user));
+
+  }
+
+  const deleteUser = () => {
+    localStorage.removeItem('user');
   }
 
   onMounted(() => {
@@ -30,6 +35,7 @@ export const useUserSession = () => {
   })
 
   return {
+    deleteUser,
     route,
     currentUser,
     setUser,

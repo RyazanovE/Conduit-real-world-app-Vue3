@@ -1,12 +1,13 @@
 <script setup lang="ts">
   import { useFetch } from '@/shared/hooks';
-  import ArticlePreview from './ArticlePreview.vue';
-  import { Article, LIMIT, feedApiService } from '..';
+  import { LIMIT, feedApiService } from '..';
   import PopularTags from './PopularTags.vue';
-  import Pagination from './Pagination.vue';
   import { useRoute } from 'vue-router';
   import { onMounted, watch } from 'vue';
   import Tabs from './Tabs.vue';
+  import { Article } from '@/shared/models';
+  import { ArticlePreview } from '@/features/article-preview';
+  import { Pagination } from '@/shared/ui';
 
   const route = useRoute();
 
@@ -60,7 +61,10 @@
             :article="article" 
             @favourited='toggleFavorite'
           />
-          <Pagination :articles-count='articlesResult?.data.articlesCount'/>
+          <Pagination 
+            :pagesAmount='articlesResult?.data.articlesCount'
+            pageName='feed'
+          />
         </div>
         <div class="col-md-3">
           <PopularTags />
