@@ -1,10 +1,10 @@
 <script setup lang="ts">
-  import { useFetch } from '@/shared/hooks';
-  import { LIMIT, feedApiService } from '..';
   import PopularTags from './PopularTags.vue';
-  import { useRoute } from 'vue-router';
-  import { onMounted, watch } from 'vue';
   import Tabs from './Tabs.vue';
+  import { useFetch } from '@/shared/hooks';
+  import { feedApiService } from '@/shared/api'
+  import { useRoute } from 'vue-router';
+  import { watchEffect } from 'vue';
   import { Article } from '@/shared/models';
   import { ArticlePreview } from '@/features/article-preview';
   import { Pagination } from '@/shared/ui';
@@ -12,23 +12,16 @@
   const route = useRoute();
 
   const { result: articlesResult, fetchData: fetchArticles } = useFetch(feedApiService.getArticles, true);
-
+  
   const updateArticles = () => {
-    fetchArticles(
-      Number(route.query.page ?? 1), 
-      route.query.tag ? String(route.query.tag) : null, 
-      Number(route.query.limit ?? LIMIT), 
-      route.query.source ? String(route.query.source) : undefined
-    )
+    articlesResult.value = null;
+
+    const page = Number(route.query.page ?? 1);
+    const tag = route.query.tag ? String(route.query.tag) : undefined
+    const source = route.query.source ? String(route.query.source) : undefined
+
+    fetchArticles({ page, tag, source })
   }
-
-  onMounted(() => {
-    updateArticles();
-  })
-
-  watch(() => route.query, () => {
-    updateArticles();
-  }, { deep: true });
 
   const toggleFavorite = ({slug, favorited}: Partial<Article>) => {
     const articles = articlesResult.value?.data.articles
@@ -39,6 +32,12 @@
       articles[index].favoritesCount = favorited ? articles[index].favoritesCount + 1 : articles[index].favoritesCount - 1
     }
   }
+
+  watchEffect(() => {
+    updateArticles();
+  });
+  
+
 
 </script>
 
@@ -54,7 +53,6 @@
       <div class="row">
         <div class="col-md-9">
           <Tabs />
-
           <ArticlePreview 
             v-for="article in articlesResult?.data?.articles" 
             :key="article.slug" 

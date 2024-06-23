@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import { computed } from 'vue';
   import { Article } from '@/shared/models';
-  import { feedApiService } from '@/pages/feed';
+  import { feedApiService } from '@/shared/api';
 
   interface ArticlePreviewProps {
     article: Article;

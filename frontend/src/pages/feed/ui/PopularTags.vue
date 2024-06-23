@@ -1,6 +1,6 @@
 <script setup lang="ts">
+  import { feedApiService } from '@/shared/api';
   import { useFetch } from '@/shared/hooks';
-  import { LIMIT, feedApiService } from '..';
   import { useRoute } from 'vue-router';
 
   const route = useRoute();
@@ -15,7 +15,7 @@
       <router-link
         v-for="tag in tagsResult?.data?.tags"
         :key="tag"
-        :to="{ name: 'feed', query: { ...route.query, source: undefined, tag, page: 1, limit: route.query.limit ?? LIMIT } }"
+        :to="{ name: 'feed', query: { ...route.query, source: undefined, tag, page: 1 } }"
         class="tag-pill tag-default"
       >
         {{ tag }}

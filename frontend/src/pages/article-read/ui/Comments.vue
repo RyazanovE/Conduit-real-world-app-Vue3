@@ -1,7 +1,7 @@
 <script setup lang="ts">
+  import { articleReadService } from '@/shared/api';
   import { useFetch, useUserSession } from '@/shared/hooks';
   import { onMounted, ref } from 'vue';
-  import { articleReadService } from '..';
 
   const commentText = ref('')
 

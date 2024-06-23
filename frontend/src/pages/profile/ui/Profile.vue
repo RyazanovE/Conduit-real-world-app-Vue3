@@ -1,14 +1,16 @@
 <script setup lang='ts'>
-  import { LIMIT, feedApiService } from '@/pages/feed';
+  import UserInfo  from './UserInfo.vue';
+  import ProfileTabs from './ProfileTabs.vue';
   import { useFetch } from '@/shared/hooks';
   import { onMounted, watch } from 'vue';
   import { ArticlePreview } from '@/features/article-preview';
   import { Pagination } from '@/shared/ui';
   import { Article } from '@/shared/models';
-  import { profileApiService } from '../api';
-  import { ProfileTabs } from '..';
   import { useRoute } from 'vue-router';
-  import { UserInfo } from '..';
+  import { profileApiService } from '../api';
+  import { feedApiService } from '@/shared/api';
+
+  type tabNames = 'profile' | 'profile-favorites';
 
   const route = useRoute();
 
@@ -27,10 +29,6 @@
     updateArticles()
   });
 
-  watch(() => route.name, () => {
-    updateArticles()
-  });
-
   const updatePage = async () => {
     profileResult.value = null;
     articlesResult.value = null;
@@ -39,19 +37,27 @@
     updateArticles();
   }
 
-  const updateArticles = () => {
+  const onTabChanged = (tabName: tabNames) => {
+    updateArticles(tabName)
+  }
+
+  const onAuthorFollowed = (following: boolean) => {
+    if (profileResult.value) {
+      profileResult.value.data.profile.following = following;
+    }
+  }
+
+  const updateArticles = (tabName: tabNames = 'profile') => {
     articlesResult.value = null;
 
     const page = Number(route.query.page ?? 1);
-    const tag = route.query.tag ? String(route.query.tag) : null;
-    const limit = Number(route.query.limit ?? LIMIT);
-    const author = route.name === 'profile' ? profileResult.value?.data.profile.username : undefined;
-    const favorites = route.name === 'profile-favorites' ? profileResult.value?.data.profile.username : undefined
+    const author = tabName === 'profile' ? profileResult.value?.data.profile.username : undefined;
+    const favorited = tabName === 'profile-favorites' ? profileResult.value?.data.profile.username : undefined
 
-    fetchArticles(page, tag, limit, undefined, author, favorites)
+    fetchArticles({ page, author, favorited})
   }
 
-  const toggleFavorite = ({slug, favorited}: Partial<Article>) => {
+  const toggleFavorite = ({ slug, favorited }: Partial<Article>) => {
     const articles = articlesResult.value?.data.articles
     const index = articles?.findIndex(article => article.slug === slug);
 
@@ -60,17 +66,18 @@
       articles[index].favoritesCount = favorited ? articles[index].favoritesCount + 1 : articles[index].favoritesCount - 1
     }
   }
-
 </script>
 
 <template>
   <div v-if='profileResult?.data'  class="profile-page">
-    <UserInfo :user='profileResult.data.profile'/>
-
+    <UserInfo 
+      :user='profileResult.data.profile'
+      @followedAuthor='onAuthorFollowed'
+      />
     <div class="container">
       <div class="row">
         <div class="col-xs-12 col-md-10 offset-md-1">
-          <ProfileTabs />
+          <ProfileTabs @tabChanged='onTabChanged'/>
           <ArticlePreview 
             v-for="article in articlesResult?.data.articles" 
             :key="article.slug" 
