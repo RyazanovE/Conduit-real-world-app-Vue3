@@ -1,8 +1,8 @@
 <script setup lang="ts">
   import { useUserSession } from '@/shared/hooks';
-  import { articleReadService } from '..';
   import { useRouter } from 'vue-router';
-import { Article } from '@/shared/models';
+  import { Article } from '@/shared/models';
+  import { articleReadService } from '@/shared/api';
 
   const props = defineProps<{article: Article}>()
   const emits = defineEmits<{

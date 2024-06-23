@@ -5,7 +5,7 @@
   import TagsInput from './TagsInput.vue';
   import { Article } from '@/shared/models';
   import { useFetch } from '@/shared/hooks';
-  import { articleReadService } from '@/pages/article-read';
+  import { articleReadService } from '@/shared/api';
 
   const router = useRouter();
   const route = useRoute()

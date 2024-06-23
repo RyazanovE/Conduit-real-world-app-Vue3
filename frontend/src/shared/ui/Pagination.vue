@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { computed } from 'vue';
-  import { LIMIT } from '../../pages/feed/api';
+  import { LIMIT } from '../api/feed-api-service';
   import { useRoute } from 'vue-router';
 
   const route = useRoute();

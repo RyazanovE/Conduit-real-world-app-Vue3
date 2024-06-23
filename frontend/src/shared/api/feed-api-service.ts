@@ -2,11 +2,13 @@ import { api } from '@/app/api/_index';
 import { MultipleArticlesResponse, SingleArticleResponse, TagsResponse } from '@/shared/models';
 import { bindAll } from '@/shared/utils';
 
-export interface Pagination {
-  tag: string | null;
-  page: number;
-  limit: number;
-  source: string;
+interface Pagination {
+  page?: number;
+  tag?: string;
+  limit?: number;
+  source?: string;
+  author?: string;
+  favorited?: string;
 }
 
 export const LIMIT = 20;
@@ -28,7 +30,7 @@ class FeedApiService {
     return token ? { Authorization: `Token ${token}`} : {}
   }
 
-  getArticles(page: Pagination['page'] = 1, tag?: Pagination['tag'], limit: Pagination['limit'] = LIMIT, source?: Pagination['source'],  author?: string, favorited?: string) {
+  getArticles({ page = 1, tag, limit = LIMIT, source,  author, favorited }: Pagination) {
     const headers = this.getAuthorization();
 
     const options = { 

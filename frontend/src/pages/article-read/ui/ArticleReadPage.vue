@@ -1,10 +1,10 @@
 <script setup lang="ts">
   import { useFetch } from '@/shared/hooks';
-  import { articleReadService } from '..';
   import Comments from './Comments.vue'
   import ArticleMeta from './ArticleMeta.vue'
   import { onMounted } from 'vue';
   import { useRoute } from 'vue-router';
+  import { articleReadService } from '@/shared/api';
 
   const route = useRoute();
 

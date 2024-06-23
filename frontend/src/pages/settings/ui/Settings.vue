@@ -1,49 +1,32 @@
 <script setup lang='ts'>
+  import SettingsForm from './SettingsForm.vue'
   import { useUserSession } from '@/shared/hooks';
-  import { UpdateUser } from '@/shared/models/sign-in';
-  import { reactive, ref, watch } from 'vue';
-  import { settingsService } from '..';
+  import { settingsService } from '../api';
   import { useRouter } from 'vue-router';
+  import { ref } from 'vue';
+  import { UpdateUser } from '@/shared/models';
 
   const router = useRouter();
-  const { currentUser, deleteUser, setUser } = useUserSession();
-
-  const formValues = reactive<UpdateUser>({
-    username: '',
-    email:'',
-    bio: '',
-    image: '',
-    password: '',
-  })
+  const { deleteUser, setUser } = useUserSession();
 
   const formErrors = ref<string[]>([])
 
-  watch(() => currentUser.value, (newValue) => {
-    if (newValue) {
-      const { bio, email, image, username } = newValue;
-      formValues.bio = bio;
-      formValues.email = email;
-      formValues.image = image;
-      formValues.username = username;
-    }
-  }, { deep: true })
-
-  const onSubmit = async () => {
+  const onSubmit = async (formValues: UpdateUser) => {
     try {
-      validateForm()
+      validateForm(formValues)
 
       const { status, data } = await settingsService.updateUser(formValues);
       
       if (status === 200) {
-        setUser(data.user)
-        router.push({ name: 'feed' })
+                setUser(data.user)
+        router.push({ name: 'profile', params: { username: data.user.username } })
       }
     } catch (error) {
       console.error(error)
     }
   }
 
-  const validateForm = () => {
+  const validateForm = (formValues: UpdateUser) => {
     formErrors.value = [];
 
     const { email, username } = formValues;
@@ -73,56 +56,10 @@
       <div class="row">
         <div class="col-md-6 offset-md-3 col-xs-12">
           <h1 class="text-xs-center">Your Settings</h1>
-
           <ul class="error-messages">
             <li v-for='error in formErrors' :key='error'>{{ error }}</li>
           </ul>
-
-          <form @submit.prevent='onSubmit'>
-            <fieldset>
-              <fieldset class="form-group">
-                <input 
-                  v-model='formValues.image' 
-                  class="form-control" 
-                  type="text" 
-                  placeholder="URL of profile picture" 
-                />
-              </fieldset>
-              <fieldset class="form-group">
-                <input 
-                  v-model='formValues.username' 
-                  class="form-control form-control-lg" 
-                  type="text" 
-                  placeholder="Your Name" 
-                />
-              </fieldset>
-              <fieldset class="form-group">
-                <textarea
-                  v-model='formValues.bio' 
-                  class="form-control form-control-lg"
-                  rows="8"
-                  placeholder="Short bio about you"
-                ></textarea>
-              </fieldset>
-              <fieldset class="form-group">
-                <input 
-                  v-model='formValues.email' 
-                  class="form-control form-control-lg" 
-                  type="text" 
-                  placeholder="Email" 
-                />
-              </fieldset>
-              <fieldset class="form-group">
-                <input
-                  v-model='formValues.password' 
-                  class="form-control form-control-lg"
-                  type="password"
-                  placeholder="New Password"
-                />
-              </fieldset>
-              <button class="btn btn-lg btn-primary pull-xs-right">Update Settings</button>
-            </fieldset>
-          </form>
+          <SettingsForm @submit='onSubmit'/>
           <hr />
           <button 
             class="btn btn-outline-danger"

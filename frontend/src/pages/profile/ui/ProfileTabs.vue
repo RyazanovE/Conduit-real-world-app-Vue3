@@ -2,6 +2,10 @@
   import { useUserSession } from '@/shared/hooks';
   
   const { route } = useUserSession()
+  const emits = defineEmits(["tabChanged"])
+
+  const profilePageName = 'profile';
+  const profileFavoritesPageName = 'profile-favorites';
 </script>
 
 <template>
@@ -9,18 +13,20 @@
     <ul  class="nav nav-pills outline-active">
       <li class="nav-item">
         <router-link 
-          :to="{name: 'profile', params: { username: route.params.username }}" 
+          :to="{name: profilePageName, params: { username: route.params.username }}" 
           class="nav-link"
-          :class="{ active: route.name === 'profile' }"
+          :class="{ active: route.name === profilePageName }"
+          @click='emits("tabChanged", profilePageName)'
         >
           My Articles
         </router-link>
       </li>
       <li class="nav-item">
         <router-link 
-          :to="{ name: 'profile-favorites', params: { username: route.params.username }}" 
+          :to="{ name: profileFavoritesPageName, params: { username: route.params.username }}" 
           class="nav-link"
-          :class="{ active: route.name === 'profile-favorites' }"
+          :class="{ active: route.name === profileFavoritesPageName}"
+          @click='emits("tabChanged", profileFavoritesPageName)'
         >
           Favorited Articles
         </router-link>
