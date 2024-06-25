@@ -1,33 +1,47 @@
 interface MockLocalStorage {
-  getItem(key: string): string | null;
-  setItem(key: string, value: string): void;
-  removeItem(key: string): void;
-  clear(): void;
+  getItem: (key: string) => string | null
+  setItem: (key: string, value: string) => void
+  removeItem: (key: string) => void
+  clear: () => void
+  length: number
+  key: (index: number) => string | null
 }
 
 const mockedLocalStorage: MockLocalStorage = (() => {
-  let store: { [key: string]: string } = {};
+  let store: { [key: string]: string } = {}
+  let _length = 0
 
   return {
     getItem: (key: string): string | null => store[key] || null,
     setItem: (key: string, value: string): void => {
-      store[key] = value;
+      if (!store[key]) {
+        store[key] = value
+        _length++
+      }
     },
     removeItem: (key: string): void => {
-      delete store[key];
+      if (store[key]) {
+        delete store[key]
+        _length--
+      }
     },
     clear: (): void => {
-      store = {};
-    }
-  };
-})();
+      store = {}
+      _length = 0
+    },
+    get length(): number {
+      return _length
+    },
+    key: (index: number): string | null => {
+      const keys = Object.keys(store)
+      return keys[index] || null
+    },
+  }
+})()
 
-export const token = 'some_token';
+export const token = 'some_token'
 
-export const mockLocalStorage = () => {
-  // @ts-ignore
-  global.localStorage = mockedLocalStorage;
-  localStorage.setItem('user', JSON.stringify({ token }));
+export function mockLocalStorage() {
+  globalThis.localStorage = mockedLocalStorage
+  localStorage.setItem('user', JSON.stringify({ token }))
 }
-
-

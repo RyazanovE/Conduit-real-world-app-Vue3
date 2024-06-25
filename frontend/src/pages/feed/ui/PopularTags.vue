@@ -1,11 +1,11 @@
 <script setup lang="ts">
-  import { feedApiService } from '@/shared/api';
-  import { useFetch } from '@/shared/hooks';
-  import { useRoute } from 'vue-router';
+import { useRoute } from 'vue-router'
+import { feedApiService } from '@/shared/api'
+import { useFetch } from '@/shared/hooks'
 
-  const route = useRoute();
+const route = useRoute()
 
-  const { result: tagsResult } = useFetch(feedApiService.getTags);
+const { result: tagsResult } = useFetch(feedApiService.getTags)
 </script>
 
 <template>

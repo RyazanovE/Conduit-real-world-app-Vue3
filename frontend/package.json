@@ -1,13 +1,15 @@
 {
   "name": "real-world-app",
-  "private": true,
-  "version": "0.0.0",
   "type": "module",
+  "version": "0.0.0",
+  "private": true,
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc && vite build",
     "preview": "vite preview",
-    "test": "vitest"
+    "test": "vitest",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "dependencies": {
     "axios": "^1.7.2",
@@ -15,9 +17,11 @@
     "vue-router": "^4.3.2"
   },
   "devDependencies": {
+    "@antfu/eslint-config": "^2.21.1",
     "@types/node": "^20.14.2",
     "@vitejs/plugin-vue": "^5.0.4",
     "@vue/test-utils": "^2.4.0-alpha.2",
+    "eslint": "^8.57.0",
     "jsdom": "^24.1.0",
     "openapi-typescript": "^6.7.6",
     "typescript": "^5.4.5",

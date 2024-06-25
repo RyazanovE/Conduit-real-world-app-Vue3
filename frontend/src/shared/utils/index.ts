@@ -1,1 +1,1 @@
-export { bindAll } from "./bind-all"
+export { bindAll } from './bind-all'

@@ -1,8 +1,7 @@
 <script setup lang="ts">
-  import { useUserSession } from '../hooks';
+import { useUserSession } from '../hooks'
 
-  const { currentUser, route } = useUserSession()
-
+const { currentUser, route } = useUserSession()
 </script>
 
 <template>
@@ -16,8 +15,8 @@
           <router-link
             prefetch="intent"
             class="nav-link"
-            :class="{ active: route.name == 'feed' }"
-            :to="{ name: 'feed'}"
+            :class="{ active: route.name === 'feed' }"
+            :to="{ name: 'feed' }"
           >
             Home
           </router-link>
@@ -27,7 +26,7 @@
             <router-link
               prefetch="intent"
               class="nav-link"
-              :class="{ active: route.name == 'login' }"
+              :class="{ active: route.name === 'login' }"
               :to="{ name: 'login' }"
             >
               Sign in
@@ -37,8 +36,8 @@
             <router-link
               prefetch="intent"
               class="nav-link"
-              :class="{ active: route.name == 'register' }"
-              :to="{ name: 'register'}"
+              :class="{ active: route.name === 'register' }"
+              :to="{ name: 'register' }"
             >
               Sign up
             </router-link>
@@ -49,20 +48,20 @@
             <router-link
               prefetch="intent"
               class="nav-link"
-              :class="{ active: route.name == 'editor' && !route.params.slug }"
+              :class="{ active: route.name === 'editor' && !route.params.slug }"
               to="/editor"
             >
-              <i class="ion-compose"></i>&nbsp;New Article
+              <i class="ion-compose" />&nbsp;New Article
             </router-link>
           </li>
           <li class="nav-item">
             <router-link
               prefetch="intent"
               class="nav-link"
-              :class="{ active: route.name == 'settings' }"
+              :class="{ active: route.name === 'settings' }"
               to="/settings"
             >
-              <i class="ion-gear-a"></i>&nbsp;Settings
+              <i class="ion-gear-a" />&nbsp;Settings
             </router-link>
           </li>
           <li class="nav-item">
@@ -79,7 +78,7 @@
                   :src="currentUser?.image"
                   class="user-pic"
                   alt=""
-                />
+                >
               </template>
               {{ currentUser?.username }}
             </router-link>

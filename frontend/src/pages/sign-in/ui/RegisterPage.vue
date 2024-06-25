@@ -1,35 +1,35 @@
 <script setup lang="ts">
-  import { useFetch, useUserSession } from '@/shared/hooks';
-  import { signInService } from '../api';
-  import { reactive } from 'vue';
-  import { useRouter } from 'vue-router';
+import { reactive } from 'vue'
+import { useRouter } from 'vue-router'
+import { signInService } from '../api'
+import { useFetch, useUserSession } from '@/shared/hooks'
 
-  const formFields = [
-    { name: 'username', placeholder: 'Username', type: 'text' },
-    { name: 'email', placeholder: 'Email', type: 'email' },
-    { name: 'password', placeholder: 'Password', type: 'password' },
-  ];
+const formFields = [
+  { name: 'username', placeholder: 'Username', type: 'text' },
+  { name: 'email', placeholder: 'Email', type: 'email' },
+  { name: 'password', placeholder: 'Password', type: 'password' },
+]
 
-  const router = useRouter();
-  const { setUser } = useUserSession();
+const router = useRouter()
+const { setUser } = useUserSession()
 
-  const formValues = reactive({
-    username: '',
-    password: '',
-    email: ''
-  })
+const formValues = reactive({
+  username: '',
+  password: '',
+  email: '',
+})
 
-  const { result: registerResult, fetchData, error, isError } = useFetch(signInService.register, true)
+const { result: registerResult, fetchData, error, isError } = useFetch(signInService.register, true)
 
-  const onSubmit = async (_e: Event) => {
-    await fetchData(formValues.username, formValues.password, formValues.email);
-    const user = registerResult.value?.data?.user
-    
-    if (!isError.value && user) {
-      setUser(user);
-      router.push({ name: 'feed' })
-    }
+async function onSubmit(_e: Event) {
+  await fetchData(formValues.username, formValues.password, formValues.email)
+  const user = registerResult.value?.data?.user
+
+  if (!isError.value && user) {
+    setUser(user)
+    router.push({ name: 'feed' })
   }
+}
 </script>
 
 <template>
@@ -37,43 +37,48 @@
     <div className="container page">
       <div className="row">
         <div className="col-md-6 offset-md-3 col-xs-12">
-          <h1 className="text-xs-center">Sign up</h1>
+          <h1 className="text-xs-center">
+            Sign up
+          </h1>
           <p className="text-xs-center">
-            <router-link :to="{name: 'login'}">Have an account?</router-link>
+            <router-link :to="{ name: 'login' }">
+              Have an account?
+            </router-link>
           </p>
-          
-          <template v-if='isError' >
-            <ul 
+
+          <template v-if="isError">
+            <ul
               v-if="typeof (error?.response?.data) === 'object'"
               className="error-messages"
             >
-              <li 
-                v-for="(key, value) of (error.response?.data as Record<string, string>)?.errors" 
+              <li
+                v-for="(key, value) of (error.response?.data as Record<string, string>)?.errors"
                 :key="value"
               >
                 {{ value }}: {{ key }}
               </li>
             </ul>
             <p
-              className="error-messages"
               v-else
+              className="error-messages"
             >
               {{ error?.response?.data }}
             </p>
           </template>
 
-          <form @submit.prevent='onSubmit'>
+          <form @submit.prevent="onSubmit">
             <fieldset
-              v-for="{name, placeholder, type} of formFields"
+              v-for="({ name, placeholder, type }, i) of formFields"
+              :key="i"
               className="form-group"
             >
               <input
-                v-model='formValues[name as keyof typeof formValues]'
+                v-model="formValues[name as keyof typeof formValues]"
                 className="form-control form-control-lg"
                 :type
                 :name
                 :placeholder
-              />
+              >
             </fieldset>
             <button className="btn btn-lg btn-primary pull-xs-right">
               Sign up

@@ -1,28 +1,29 @@
 <script setup lang="ts">
-  import { useUserSession } from '@/shared/hooks';
-  import { LocationQueryRaw, useRouter } from 'vue-router';
+import type { LocationQueryRaw } from 'vue-router'
+import { useRouter } from 'vue-router'
+import { useUserSession } from '@/shared/hooks'
 
-  const router = useRouter();
+const router = useRouter()
 
-  const { currentUser, route } = useUserSession()
+const { currentUser, route } = useUserSession()
 
-  const navigate = (query?: LocationQueryRaw) => {
-    router.push({ ...route, query });
-  };
+function navigate(query?: LocationQueryRaw) {
+  router.push({ ...route, query })
+}
 </script>
 
 <template>
   <form @submit.prevent>
     <div class="feed-toggle">
       <ul class="nav nav-pills outline-active">
-        <li class="nav-item" v-if="currentUser !== null">
+        <li v-if="currentUser !== null" class="nav-item">
           <button
-            class='nav-link'
+            class="nav-link"
             :class="{ active: route.query.source === 'my-feed' }"
             @click="navigate({ source: 'my-feed' })"
           >
             Your Feed
-          </button> 
+          </button>
         </li>
         <li class="nav-item">
           <button
@@ -33,9 +34,9 @@
             Global Feed
           </button>
         </li>
-        <li class="nav-item" v-if="!!route.query.tag">
+        <li v-if="!!route.query.tag" class="nav-item">
           <span class="nav-link active">
-            <i class="ion-pound"></i> {{ route.query.tag }}
+            <i class="ion-pound" /> {{ route.query.tag }}
           </span>
         </li>
       </ul>
