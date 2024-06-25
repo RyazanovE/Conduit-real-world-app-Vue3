@@ -22,22 +22,19 @@ function emitFavourited(favorited: boolean) {
 }
 
 async function onFavourite() {
-  try {
-    const favorited = props.article.favorited
+  const favorited = props.article.favorited
 
+  try {
     const method = favorited
       ? feedApiService.unfavouriteArticle
       : feedApiService.favouriteArticle
 
     emitFavourited(!favorited)
-    const { status } = await method(props.article.slug)
-
-    if (status !== 200) {
-      emitFavourited(favorited)
-    }
+    await method(props.article.slug)
   }
   catch (error) {
     console.error(error)
+    emitFavourited(favorited)
   }
 }
 </script>

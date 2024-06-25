@@ -93,7 +93,7 @@ describe('articlePreview Component', () => {
     })
 
     it('restores favorite state on incorrect DELETE response and emits event', async () => {
-      vitest.spyOn(api, 'delete').mockResolvedValue({
+      vitest.spyOn(api, 'delete').mockRejectedValue({
         data: null,
         status: 500,
       })
@@ -128,7 +128,7 @@ describe('articlePreview Component', () => {
     it('restores favorite state on incorrect POST response and emits event', async () => {
       await wrapper.setProps({ article: anotherArticle })
 
-      vitest.spyOn(api, 'post').mockResolvedValue({
+      vitest.spyOn(api, 'post').mockRejectedValue({
         data: null,
         status: 500,
       })

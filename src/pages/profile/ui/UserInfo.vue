@@ -24,22 +24,19 @@ const followButtonName = computed(() => {
 })
 
 async function toggleFollow() {
-  try {
-    const following = props.user.following
+  const following = props.user.following
 
+  try {
     const method = following
       ? articleReadService.unfollowAuthor
       : articleReadService.followAuthor
 
     emits('followedAuthor', !following)
-    const { status } = await method(props.user.username)
-
-    if (status !== 200) {
-      emits('followedAuthor', following)
-    }
+    await method(props.user.username)
   }
   catch (error) {
     console.error(error)
+    emits('followedAuthor', following)
   }
 }
 </script>
