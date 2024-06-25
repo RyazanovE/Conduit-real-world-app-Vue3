@@ -18,13 +18,12 @@ api.interceptors.request.use(
     if (user) {
       token = JSON.parse(user).token
     }
-    const noAuthUrls = [
-      '/users',
-      '/users/login',
-      '/articles',
-      '/tags',
+    const authRequiredUrls = [
+      '/settings',
+      '/profile',
+      '/editor',
     ]
-    const isAuthRequired = config.url && !noAuthUrls.includes(config.url)
+    const isAuthRequired = config.url && authRequiredUrls.some(url => config.url?.includes(url))
 
     if (isAuthRequired && !token) {
       sessionStorage.removeItem('user')
