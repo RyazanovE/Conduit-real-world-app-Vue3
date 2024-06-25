@@ -27,7 +27,7 @@ class FeedApiService {
     }
 
 
-    return token ? { Authorization: `Token ${token}`} : {}
+    return token ? { Authorization: `Token ${token}` } : {}
   }
 
   getArticles({ page = 1, tag, limit = LIMIT, source,  author, favorited }: Pagination) {

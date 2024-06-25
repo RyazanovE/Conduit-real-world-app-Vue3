@@ -7,7 +7,7 @@ import { LoginPage, RegisterPage } from '@/pages/sign-in';
 import { Profile } from '@/pages/profile';
 
 
-const routes = [
+export const routes = [
   { path: '/', component: FeedPage, name: 'feed' },
   { path: '/register', component: RegisterPage, name: 'register' },
   { path: '/login', component: LoginPage, name: 'login' },

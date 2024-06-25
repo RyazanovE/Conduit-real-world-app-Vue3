@@ -57,7 +57,7 @@
             v-for="article in articlesResult?.data?.articles" 
             :key="article.slug" 
             :article="article" 
-            @favourited='toggleFavorite'
+            @favorited='toggleFavorite'
           />
           <Pagination 
             :pagesAmount='articlesResult?.data.articlesCount'

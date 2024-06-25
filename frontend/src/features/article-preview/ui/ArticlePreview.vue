@@ -8,7 +8,7 @@
   }
   const props = defineProps<ArticlePreviewProps>();
   const emits = defineEmits<{
-    (e: 'favourited', payload: { slug: string; favorited: boolean }): void;
+    (e: 'favorited', payload: { slug: string; favorited: boolean }): void;
   }>();
 
 
@@ -19,7 +19,7 @@
   })
 
   const emitFavourited = (favorited: boolean) => {
-    emits('favourited', { slug: props.article.slug, favorited})
+    emits('favorited', { slug: props.article.slug, favorited})
   }
 
   const onFavourite = async () => {
@@ -45,22 +45,24 @@
 <template>
   <div class="article-preview">
     <div class="article-meta">
-      <router-link :to="`/profile/${props.article.author.username}`">
-        <img :src="props.article.author.image" alt="" />
+      <router-link data-test='img-profile-link' :to="{ name: 'profile', params: { username: props.article.author.username }}">
+        <img data-test='author-image' :src="props.article.author.image" alt="" />
       </router-link>
       <div class="info">
         <router-link
-          :to="`/profile/${props.article.author.username}`"
+          :to="{ name: 'profile', params: { username: props.article.author.username }}"
+          data-test='author-username-link'
           class="author"
         >
           {{ props.article.author.username }}
         </router-link>
-        <span class="date">
+        <span data-test='article-date' class="date">
           {{ formattedDate }}
         </span>
       </div>
       <form @submit.prevent='onFavourite'>
         <button
+          data-test='button-favorite'
           class='btn btn-sm pull-xs-right'
           :class="[ props.article.favorited ? 'btn-primary' : 'btn-outline-primary']"
         >
@@ -71,11 +73,12 @@
     <router-link
       :to="{ name: 'article', params: { slug: props.article.slug }}"
       class="preview-link"
+      data-test='article-profile-link'
     >
-      <h1>{{ props.article.title }}</h1>
-      <p>{{ props.article.description }}</p>
+      <h1 data-test='article-title'>{{ props.article.title }}</h1>
+      <p data-test='article-description'>{{ props.article.description }}</p>
       <span>Read more...</span>
-      <ul class="tag-list">
+      <ul data-test="tag-list" class="tag-list">
         <li v-for="tag in article.tagList" :key="tag" class="tag-default tag-pill tag-outline">
           {{ tag }}
         </li>
