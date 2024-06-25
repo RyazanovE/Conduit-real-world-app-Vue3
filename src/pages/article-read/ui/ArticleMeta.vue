@@ -27,22 +27,19 @@ async function handleDelete() {
 }
 
 async function toggleFollow() {
-  try {
-    const following = props.article.author.following
+  const following = props.article.author.following
 
+  try {
     const method = following
       ? articleReadService.unfollowAuthor
       : articleReadService.followAuthor
 
     emits('followedAuthor', !following)
-    const { status } = await method(props.article.author.username)
-
-    if (status !== 200) {
-      emits('followedAuthor', following)
-    }
+    await method(props.article.author.username)
   }
   catch (error) {
     console.error(error)
+    emits('followedAuthor', following)
   }
 }
 
