@@ -45,6 +45,10 @@ npm run build
 
 v18.17.0
 
+## Vercel Deploy
+
+https://real-world-app-sooty.vercel.app/
+
 ## Related Efforts
 
 * [vue3-realworld-example-app](https://github.com/mutoe/vue3-realworld-example-app) - Explore the charm of Vue composition API! Vite?
