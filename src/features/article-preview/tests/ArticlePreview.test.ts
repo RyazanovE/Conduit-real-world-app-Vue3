@@ -5,6 +5,7 @@ import ArticlePreview from '../ui/ArticlePreview.vue'
 import { anotherArticle, article } from './constants'
 import { api } from '@/app/api/_index'
 import { mockLocalStorage, token } from '@/../vitest.setup.ts'
+import { RouterLink } from 'vue-router'
 
 mockLocalStorage()
 
@@ -67,9 +68,9 @@ describe('articlePreview Component', () => {
 
   describe('router-links', () => {
     it('have correct :to attribute', () => {
-      const imgProfileLink = wrapper.getComponent('[data-test=\'img-profile-link\']')
-      const usernameProfileLink = wrapper.getComponent('[data-test=\'author-username-link\']')
-      const articleProfileLink = wrapper.getComponent('[data-test=\'article-profile-link\']')
+      const imgProfileLink = wrapper.getComponent<typeof RouterLink>('[data-test=\'img-profile-link\']')
+      const usernameProfileLink = wrapper.getComponent<typeof RouterLink>('[data-test=\'author-username-link\']')
+      const articleProfileLink = wrapper.getComponent<typeof RouterLink>('[data-test=\'article-profile-link\']')
 
       expect(imgProfileLink.props().to).toEqual({ name: 'profile', params: { username: article.author.username } })
       expect(usernameProfileLink.props().to).toEqual({ name: 'profile', params: { username: article.author.username } })

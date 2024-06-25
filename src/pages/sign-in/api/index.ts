@@ -1,7 +1,7 @@
 import type { AxiosResponse } from 'axios'
 import { api } from '@/app/api/_index'
-import type { LoginUserRequest, NewUserRequest, UserResponse } from '@/pages/sign-in/models'
 import { bindAll } from '@/shared/utils'
+import type { LoginUserRequest, NewUserRequest, UserResponse } from '@/shared/models'
 
 class SignInService {
   constructor() {
