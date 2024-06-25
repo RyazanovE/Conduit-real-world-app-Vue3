@@ -23,7 +23,7 @@ api.interceptors.request.use(
       '/profile',
       '/editor',
     ]
-    const isAuthRequired = config.url && authRequiredUrls.some(url => config.url?.includes(url))
+    const isAuthRequired = authRequiredUrls.some(url => config.url?.includes(url))
 
     if (isAuthRequired && !token) {
       sessionStorage.removeItem('user')
