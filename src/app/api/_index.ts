@@ -19,9 +19,8 @@ api.interceptors.request.use(
       token = JSON.parse(user).token
     }
     const authRequiredUrls = [
-      '/settings',
-      '/profile',
-      '/editor',
+      '/favorite',
+      '/follow',
     ]
     const isAuthRequired = authRequiredUrls.some(url => config.url?.includes(url))
 

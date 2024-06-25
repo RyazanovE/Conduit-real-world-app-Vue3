@@ -39,6 +39,7 @@ async function toggleFollow() {
   }
   catch (error) {
     console.error(error)
+    console.log(1)
     emits('followedAuthor', following)
   }
 }

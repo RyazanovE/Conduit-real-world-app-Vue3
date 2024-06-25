@@ -11,9 +11,9 @@ export const routes = [
   { path: '/register', component: RegisterPage, name: 'register' },
   { path: '/login', component: LoginPage, name: 'login' },
   { path: '/article/:slug', component: ArticleReadPage, name: 'article' },
-  { path: '/editor', component: ArticleReadPage, name: 'editor-new' },
-  { path: '/editor/:slug?', component: ArticleEditPage, name: 'editor' },
-  { path: '/settings', component: Settings, name: 'settings' },
+  { path: '/editor', component: ArticleReadPage, name: 'editor-new', meta: { requiresAuth: true } },
+  { path: '/editor/:slug?', component: ArticleEditPage, name: 'editor', meta: { requiresAuth: true } },
+  { path: '/settings', component: Settings, name: 'settings', meta: { requiresAuth: true } },
   { path: '/profile/:username', component: Profile, name: 'profile' },
   { path: '/profile/:username/favorites', component: Profile, name: 'profile-favorites' },
 ]
@@ -29,6 +29,15 @@ const router = createRouter({
       return { top: 0 }
     }
   },
+})
+
+router.beforeEach((to) => {
+  const user = localStorage.getItem('user')
+  const isAuthRequired = to.matched.some(record => record.meta.requiresAuth)
+
+  if (isAuthRequired && !user && to.name !== 'Login') {
+    return { name: 'login' }
+  }
 })
 
 export default router
