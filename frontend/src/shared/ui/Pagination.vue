@@ -1,37 +1,37 @@
 <script setup lang="ts">
-  import { computed } from 'vue';
-  import { LIMIT } from '../api/feed-api-service';
-  import { useRoute } from 'vue-router';
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+import { LIMIT } from '../api/feed-api-service'
 
-  const route = useRoute();
-  
-  const props = defineProps<{ pagesAmount?: number, pageName: string }>()
+const props = defineProps<{ pagesAmount?: number, pageName: string }>()
 
-  const pages = computed(() => {
-    const amount = props.pagesAmount;
-    const length = amount ? Math.ceil(amount / Number(route.query.limit ?? LIMIT)) : 1;
+const route = useRoute()
 
-    return Array.from({ length }, (_, index) => index + 1);
-  })
+const pages = computed(() => {
+  const amount = props.pagesAmount
+  const length = amount ? Math.ceil(amount / Number(route.query.limit ?? LIMIT)) : 1
+
+  return Array.from({ length }, (_, index) => index + 1)
+})
 </script>
 
 <template>
   <form>
-    <ul 
-      v-if='pages.length > 1' 
+    <ul
+      v-if="pages.length > 1"
       class="pagination"
     >
-      <template 
-        v-for='page of pages'
-        :key="page" 
+      <template
+        v-for="page of pages"
+        :key="page"
       >
-        <li 
-          v-if="Number(route.query.page ?? 1) === page"  
+        <li
+          v-if="Number(route.query.page ?? 1) === page"
           class="page-item active"
         >
           <span class="page-link">{{ page }}</span>
         </li>
-        <li 
+        <li
           v-else
           class="page-item"
         >

@@ -1,11 +1,10 @@
 <script setup lang="ts">
-  import { Header }  from './shared/ui';
-  import { Footer } from './shared/ui';
+import { Footer, Header } from './shared/ui'
 </script>
 
 <template>
   <Header />
-  <router-view/>
+  <router-view />
   <Footer />
 </template>
 

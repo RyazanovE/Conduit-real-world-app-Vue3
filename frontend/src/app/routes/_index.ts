@@ -1,11 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { ArticleReadPage } from '@/pages/article-read';
-import { ArticleEditPage } from '@/pages/article-edit';
-import { Settings } from '@/pages/settings';
-import { FeedPage } from '@/pages/feed';
-import { LoginPage, RegisterPage } from '@/pages/sign-in';
-import { Profile } from '@/pages/profile';
-
+import { ArticleReadPage } from '@/pages/article-read'
+import { ArticleEditPage } from '@/pages/article-edit'
+import { Settings } from '@/pages/settings'
+import { FeedPage } from '@/pages/feed'
+import { LoginPage, RegisterPage } from '@/pages/sign-in'
+import { Profile } from '@/pages/profile'
 
 export const routes = [
   { path: '/', component: FeedPage, name: 'feed' },
@@ -24,9 +23,10 @@ const router = createRouter({
   routes,
   scrollBehavior(_to, _from, savedPosition) {
     if (savedPosition) {
-      return savedPosition;
-    } else {
-      return { top: 0 };
+      return savedPosition
+    }
+    else {
+      return { top: 0 }
     }
   },
 })

@@ -1,75 +1,77 @@
 <script setup lang="ts">
-  import { useUserSession } from '@/shared/hooks';
-  import { useRouter } from 'vue-router';
-  import { Article } from '@/shared/models';
-  import { articleReadService } from '@/shared/api';
+import { useRouter } from 'vue-router'
+import { useUserSession } from '@/shared/hooks'
+import type { Article } from '@/shared/models'
+import { articleReadService } from '@/shared/api'
 
-  const props = defineProps<{article: Article}>()
-  const emits = defineEmits<{
-    (e: 'followedAuthor', payload: boolean): void;
-    (e: 'favoritedArticle', payload: boolean): void;
-  }>();
+const props = defineProps<{ article: Article }>()
+const emits = defineEmits<{
+  (e: 'followedAuthor', payload: boolean): void
+  (e: 'favoritedArticle', payload: boolean): void
+}>()
 
-  const { currentUser } = useUserSession();
-  const router = useRouter();
+const { currentUser } = useUserSession()
+const router = useRouter()
 
-  const handleDelete = async () => {
-    try {
-      const { status } = await articleReadService.deleteArticle(props.article.slug)
+async function handleDelete() {
+  try {
+    const { status } = await articleReadService.deleteArticle(props.article.slug)
 
-      if (status === 204) {
-        router.push({ name: 'feed' })
-      }
-    } catch (error) {
-      console.error(error)
-    }
-
-  }
-
-  const toggleFollow = async () => {
-    try {
-      const following = props.article.author.following
-
-      const method = following
-        ? articleReadService.unfollowAuthor
-        : articleReadService.followAuthor
-
-      emits('followedAuthor', !following)
-      const { status } = await method(props.article.author.username)
-
-      if (status !== 200) {
-        emits('followedAuthor', following)
-      }
-    } catch (error) {
-      console.error(error)
+    if (status === 204) {
+      router.push({ name: 'feed' })
     }
   }
+  catch (error) {
+    console.error(error)
+  }
+}
 
-  const toggleFavorite = async () => {
-    try {
-      const favorited = props.article.favorited
+async function toggleFollow() {
+  try {
+    const following = props.article.author.following
 
-      const method = favorited
-        ? articleReadService.unfavoriteArticle
-        : articleReadService.favoriteArticle
+    const method = following
+      ? articleReadService.unfollowAuthor
+      : articleReadService.followAuthor
 
-      emits('favoritedArticle', !favorited)
-      const { status } = await method(props.article.slug)
+    emits('followedAuthor', !following)
+    const { status } = await method(props.article.author.username)
 
-      if (status !== 200) {
-        emits('favoritedArticle', favorited)
-      }
-    } catch (error) {
-      console.error(error)
+    if (status !== 200) {
+      emits('followedAuthor', following)
     }
-  } 
+  }
+  catch (error) {
+    console.error(error)
+  }
+}
+
+async function toggleFavorite() {
+  try {
+    const favorited = props.article.favorited
+
+    const method = favorited
+      ? articleReadService.unfavoriteArticle
+      : articleReadService.favoriteArticle
+
+    emits('favoritedArticle', !favorited)
+    const { status } = await method(props.article.slug)
+
+    if (status !== 200) {
+      emits('favoritedArticle', favorited)
+    }
+  }
+  catch (error) {
+    console.error(error)
+  }
+}
 </script>
 
 <template>
   <form @submit.prevent>
     <div class="article-meta">
       <router-link :to="`/profile/${props.article.author.username}`">
-        <img :src="props.article.author.image" alt="" />
+        <img :src="props.article.author.image" alt="">
       </router-link>
 
       <div class="info">
@@ -79,24 +81,24 @@
         <span class="date">{{ props.article.createdAt }}</span>
       </div>
 
-      <div v-if="props.article.author.username === currentUser?.username" style='display: inline'>
+      <div v-if="props.article.author.username === currentUser?.username" style="display: inline">
         <router-link :to="`/editor/${props.article.slug}`" class="btn btn-sm btn-outline-secondary">
-          <i class="ion-edit"></i> Edit Article
+          <i class="ion-edit" /> Edit Article
         </router-link>
         &nbsp;&nbsp;
-        <button @click="handleDelete" class="btn btn-sm btn-outline-danger">
-          <i class="ion-trash-a"></i> Delete Article
+        <button class="btn btn-sm btn-outline-danger" @click="handleDelete">
+          <i class="ion-trash-a" /> Delete Article
         </button>
       </div>
-      <div v-else style='display: inline'>
-        <input type="hidden" name="username" :value="props.article.author.username" />
-        <button @click="toggleFollow" :class="['btn btn-sm', props.article.author.following ? 'btn-secondary' : 'btn-outline-secondary']">
-          <i class="ion-plus-round"></i>
+      <div v-else style="display: inline">
+        <input type="hidden" name="username" :value="props.article.author.username">
+        <button class="btn btn-sm" :class="[props.article.author.following ? 'btn-secondary' : 'btn-outline-secondary']" @click="toggleFollow">
+          <i class="ion-plus-round" />
           &nbsp; {{ props.article.author.following ? 'Unfollow' : 'Follow' }} {{ props.article.author.username }}
         </button>
         &nbsp;&nbsp;
-        <button @click="toggleFavorite" :class="['btn btn-sm', props.article.favorited ? 'btn-primary' : 'btn-outline-primary']">
-          <i class="ion-heart"></i>
+        <button class="btn btn-sm" :class="[props.article.favorited ? 'btn-primary' : 'btn-outline-primary']" @click="toggleFavorite">
+          <i class="ion-heart" />
           &nbsp; {{ props.article.favorited ? 'Unfavorite' : 'Favorite' }} Post
           <span class="counter">({{ props.article.favoritesCount }})</span>
         </button>
