@@ -10,6 +10,8 @@ const emits = defineEmits(['update:tags'])
 
 const tagsInputValue = computed(() => props.tags?.join(',') ?? '')
 
+const filteredTags = computed(() => props.tags?.filter(Boolean) ?? [])
+
 function handleInputChange(event: Event) {
   const input = event.target as HTMLInputElement
   emits('update:tags', input.value.split(','))
@@ -22,6 +24,7 @@ function removeTag(tag: string) {
 
 <template>
   <input
+    data-test="tags-input"
     type="text"
     class="form-control"
     placeholder="Enter tags"
@@ -30,8 +33,9 @@ function removeTag(tag: string) {
   >
   <div class="tag-list">
     <span
-      v-for="tag in props.tags"
+      v-for="tag in filteredTags"
       :key="tag"
+      data-test="tag-list-item"
       class="tag-default tag-pill"
     >
       <i

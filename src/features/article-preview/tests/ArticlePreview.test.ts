@@ -1,11 +1,11 @@
 import type { VueWrapper } from '@vue/test-utils'
 import { mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vitest } from 'vitest'
+import type { RouterLink } from 'vue-router'
 import ArticlePreview from '../ui/ArticlePreview.vue'
 import { anotherArticle, article } from './constants'
 import { api } from '@/app/api/_index'
 import { mockLocalStorage, token } from '@/../vitest.setup.ts'
-import { RouterLink } from 'vue-router'
 
 mockLocalStorage()
 
@@ -93,6 +93,7 @@ describe('articlePreview Component', () => {
     })
 
     it('restores favorite state on incorrect DELETE response and emits event', async () => {
+      vitest.spyOn(console, 'error').mockImplementation(() => {})
       vitest.spyOn(api, 'delete').mockRejectedValue({
         data: null,
         status: 500,
@@ -126,6 +127,7 @@ describe('articlePreview Component', () => {
     })
 
     it('restores favorite state on incorrect POST response and emits event', async () => {
+      vitest.spyOn(console, 'error').mockImplementation(() => {})
       await wrapper.setProps({ article: anotherArticle })
 
       vitest.spyOn(api, 'post').mockRejectedValue({

@@ -4,7 +4,7 @@ const props = defineProps<{ errors: string[] }>()
 
 <template>
   <ul v-if="props.errors.length" class="error-messages">
-    <li v-for="(error, index) in errors" :key="index">
+    <li v-for="(error, index) in errors" :key="index" data-test="error-item">
       {{ error }}
     </li>
   </ul>

@@ -15,19 +15,19 @@ const { fetchData, result: articleResult } = useFetch(articleReadService.getArti
 const formErrors = ref<string[]>([])
 
 const form = reactive<Partial<Article>>({
-  title: articleResult.value?.data.article.title || '',
-  description: articleResult.value?.data.article.description || '',
-  body: articleResult.value?.data.article.body || '',
-  tagList: articleResult.value?.data.article.tagList || [],
+  title: '',
+  description: '',
+  body: '',
+  tagList: [],
 })
 
-onMounted(async () => {
+onMounted(() => {
   if (route.params.slug) {
     fetchData(String(route.params.slug))
   }
 })
 
-watch(() => articleResult.value?.data.article, (newValue) => {
+watch(() => articleResult.value?.data?.article, (newValue) => {
   if (newValue) {
     const { title, description, body, tagList } = newValue
     form.tagList = tagList
@@ -90,6 +90,7 @@ function validateForm() {
               <fieldset class="form-group">
                 <input
                   v-model="form.title"
+                  data-test="article-title-input"
                   type="text"
                   class="form-control form-control-lg"
                   placeholder="Article Title"
@@ -98,6 +99,7 @@ function validateForm() {
               <fieldset class="form-group">
                 <input
                   v-model="form.description"
+                  data-test="article-description-input"
                   type="text"
                   class="form-control"
                   placeholder="What's this article about?"
@@ -106,6 +108,7 @@ function validateForm() {
               <fieldset class="form-group">
                 <textarea
                   v-model="form.body"
+                  data-test="article-body-textarea"
                   class="form-control"
                   rows="8"
                   placeholder="Write your article (in markdown)"
@@ -117,7 +120,7 @@ function validateForm() {
                 />
               </fieldset>
 
-              <button class="btn btn-lg pull-xs-right btn-primary">
+              <button type="submit" data-test="publish-button" class="btn btn-lg pull-xs-right btn-primary">
                 Publish Article
               </button>
             </fieldset>
