@@ -17,6 +17,7 @@ const { result: tagsResult } = useFetch(feedApiService.getTags)
         :key="tag"
         :to="{ name: 'feed', query: { ...route.query, source: undefined, tag, page: 1 } }"
         class="tag-pill tag-default"
+        data-test="popular-tag"
       >
         {{ tag }}
       </router-link>

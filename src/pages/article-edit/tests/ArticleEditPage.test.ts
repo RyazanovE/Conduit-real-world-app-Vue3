@@ -4,11 +4,10 @@ import { afterEach, beforeEach, describe, expect, it, vitest } from 'vitest'
 import { useRoute } from 'vue-router'
 import ArticleEditPage from '../ui/ArticleEditPage.vue'
 import TagsInput from '../ui/TagsInput.vue'
-import { mockLocalStorage, token } from '@/../vitest.setup.ts'
+import { authFetchOptions, clearLocalStorage, mockLocalStorage } from '@/../vitest.setup.ts'
 import { api } from '@/app/api/_index'
 import { anotherArticle, article } from '@/features/article-preview/tests/constants'
 
-mockLocalStorage()
 const push = vitest.fn()
 
 vitest.mock('vue-router', async (importOriginal) => {
@@ -27,14 +26,33 @@ vitest.mock('vue-router', async (importOriginal) => {
 })
 
 describe('articleEditPage Component', () => {
-  let wrapper: VueWrapper<any>
+  let wrapper: VueWrapper<any> | null
 
-  afterEach(() => {
-    wrapper.unmount()
-    vitest.restoreAllMocks()
+  beforeEach(() => {
+    mockLocalStorage()
   })
 
-  const getByTestId = (testId: string) => wrapper.get(`[data-test="${testId}"]`)
+  afterEach(() => {
+    wrapper = null
+    vitest.restoreAllMocks()
+    clearLocalStorage()
+  })
+
+  function createWrapper() {
+    return mount(ArticleEditPage, {
+      shallow: true,
+      global: {
+        stubs: {
+          TagsInput: {
+            template: '<div></div>',
+            props: ['tags'],
+          },
+        },
+      },
+    })
+  }
+
+  const getByTestId = (testId: string) => wrapper?.get(`[data-test="${testId}"]`)
 
   describe('fetch article requests', () => {
     it('correctrly presets and updates form', async () => {
@@ -42,25 +60,15 @@ describe('articleEditPage Component', () => {
         data: { article },
         status: 200,
       })
-      wrapper = mount(ArticleEditPage, {
-        shallow: true,
-        global: {
-          stubs: {
-            TagsInput: {
-              template: '<div></div>',
-              props: ['tags'],
-            },
-          },
-        },
-      })
+      wrapper = createWrapper()
 
       expect(api.get).toHaveBeenCalledOnce()
-      expect(api.get).toHaveBeenCalledWith(`/articles/${article.slug}`, { headers: { Authorization: `Token ${token}` } })
+      expect(api.get).toHaveBeenCalledWith(`/articles/${article.slug}`, authFetchOptions)
       await flushPromises()
 
-      expect((getByTestId('article-title-input').element as HTMLInputElement).value).toBe(article.title)
-      expect((getByTestId('article-description-input').element as HTMLInputElement).value).toBe(article.description)
-      expect((getByTestId('article-body-textarea').element as HTMLTextAreaElement).value).toBe(article.body)
+      expect((getByTestId('article-title-input')?.element as HTMLInputElement).value).toBe(article.title)
+      expect((getByTestId('article-description-input')?.element as HTMLInputElement).value).toBe(article.description)
+      expect((getByTestId('article-body-textarea')?.element as HTMLTextAreaElement).value).toBe(article.body)
       expect(wrapper.getComponent(TagsInput).props('tags')).toEqual(article.tagList)
     })
     it('correctly handles error in response', async () => {
@@ -68,25 +76,15 @@ describe('articleEditPage Component', () => {
         data: null,
         status: 500,
       })
-      wrapper = mount(ArticleEditPage, {
-        shallow: true,
-        global: {
-          stubs: {
-            TagsInput: {
-              template: '<div></div>',
-              props: ['tags'],
-            },
-          },
-        },
-      })
+      wrapper = createWrapper()
 
       expect(api.get).toHaveBeenCalledOnce()
-      expect(api.get).toHaveBeenCalledWith(`/articles/${article.slug}`, { headers: { Authorization: `Token ${token}` } })
+      expect(api.get).toHaveBeenCalledWith(`/articles/${article.slug}`, authFetchOptions)
       await flushPromises()
 
-      expect((getByTestId('article-title-input').element as HTMLInputElement).value).toBe('')
-      expect((getByTestId('article-description-input').element as HTMLInputElement).value).toBe('')
-      expect((getByTestId('article-body-textarea').element as HTMLTextAreaElement).value).toBe('')
+      expect((getByTestId('article-title-input')?.element as HTMLInputElement).value).toBe('')
+      expect((getByTestId('article-description-input')?.element as HTMLInputElement).value).toBe('')
+      expect((getByTestId('article-body-textarea')?.element as HTMLTextAreaElement).value).toBe('')
       expect(wrapper.getComponent(TagsInput).props('tags').length).toBe(0)
     })
   })
@@ -102,23 +100,21 @@ describe('articleEditPage Component', () => {
         data: { article: { ...article, valuesToUpdate } },
         status: 200,
       })
-      wrapper = mount(ArticleEditPage, {
-        shallow: true,
-      })
+      wrapper = createWrapper()
       await flushPromises()
 
-      getByTestId('article-title-input').setValue(valuesToUpdate.title)
-      getByTestId('article-description-input').setValue(valuesToUpdate.description)
-      getByTestId('article-body-textarea').setValue(valuesToUpdate.body)
+      getByTestId('article-title-input')?.setValue(valuesToUpdate.title)
+      getByTestId('article-description-input')?.setValue(valuesToUpdate.description)
+      getByTestId('article-body-textarea')?.setValue(valuesToUpdate.body)
       const { form } = wrapper.vm
       form.tagList = valuesToUpdate.tagList
       await flushPromises()
 
-      getByTestId('publish-button').trigger('submit')
+      getByTestId('publish-button')?.trigger('submit')
       await flushPromises()
 
       expect(api.put).toHaveBeenCalledOnce()
-      expect(api.put).toHaveBeenCalledWith(`/articles/${article.slug}`, { article: valuesToUpdate }, { headers: { Authorization: `Token ${token}` } })
+      expect(api.put).toHaveBeenCalledWith(`/articles/${article.slug}`, { article: valuesToUpdate }, authFetchOptions)
       expect(push).toHaveBeenCalledOnce()
       expect(push).toHaveBeenCalledWith({ name: 'article', params: { slug: article.slug } })
     })
@@ -139,30 +135,28 @@ describe('articleEditPage Component', () => {
         data: { article: { ...article, valuesToCreate } },
         status: 200,
       })
-      wrapper = mount(ArticleEditPage, {
-        shallow: true,
-      })
+      wrapper = createWrapper()
       await flushPromises()
 
-      getByTestId('article-title-input').setValue(valuesToCreate.title)
-      getByTestId('article-description-input').setValue(valuesToCreate.description)
-      getByTestId('article-body-textarea').setValue(valuesToCreate.body)
+      getByTestId('article-title-input')?.setValue(valuesToCreate.title)
+      getByTestId('article-description-input')?.setValue(valuesToCreate.description)
+      getByTestId('article-body-textarea')?.setValue(valuesToCreate.body)
       const { form } = wrapper.vm
       form.tagList = valuesToCreate.tagList
       await flushPromises()
 
-      getByTestId('publish-button').trigger('submit')
+      getByTestId('publish-button')?.trigger('submit')
       await flushPromises()
 
       expect(api.post).toHaveBeenCalledOnce()
-      expect(api.post).toHaveBeenCalledWith(`/articles`, { article: valuesToCreate }, { headers: { Authorization: `Token ${token}` } })
+      expect(api.post).toHaveBeenCalledWith(`/articles`, { article: valuesToCreate }, authFetchOptions)
       expect(push).toHaveBeenCalledOnce()
       expect(push).toHaveBeenCalledWith({ name: 'article', params: { slug: article.slug } })
     })
 
     it('renders errors correctly', async () => {
       const valuesToUpdate = { title: anotherArticle.title, description: anotherArticle.description, body: anotherArticle.body, tagList: anotherArticle.tagList }
-      vitest.spyOn(console, 'error').mockImplementation(() => {})
+      vitest.spyOn(console, 'error').mockImplementation(() => { })
       vitest.spyOn(api, 'get').mockResolvedValue({
         data: null,
         status: 500,
@@ -171,21 +165,19 @@ describe('articleEditPage Component', () => {
         data: { article: { ...article, valuesToUpdate } },
         status: 200,
       })
-      wrapper = mount(ArticleEditPage, {
-        shallow: true,
-      })
+      wrapper = createWrapper()
       await flushPromises()
 
-      getByTestId('publish-button').trigger('submit')
+      getByTestId('publish-button')?.trigger('submit')
       await flushPromises()
 
       expect(api.put).not.toHaveBeenCalled()
       expect(push).not.toHaveBeenCalled()
       expect(wrapper.vm.formErrors.length).toBe(3)
 
-      getByTestId('article-title-input').setValue(valuesToUpdate.title)
+      getByTestId('article-title-input')?.setValue(valuesToUpdate.title)
       await flushPromises()
-      getByTestId('publish-button').trigger('submit')
+      getByTestId('publish-button')?.trigger('submit')
       await flushPromises()
 
       expect(api.put).not.toHaveBeenCalled()
