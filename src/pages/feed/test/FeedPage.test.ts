@@ -79,6 +79,30 @@ describe('feedPage component', () => {
     expect(popularTags.exists()).toBeTruthy()
   })
 
+  it('handles articles error response', async () => {
+    const tag = 'some-tag'
+    const page = 2
+
+    vi.spyOn(api, 'get').mockRejectedValue({
+      status: 500,
+    })
+
+    router = await createRealRouter([{ path: '/', component: FeedPage }], { page, tag, source: 'my-feed' })
+    wrapper = createWrapper()
+
+    expect(api.get).toHaveBeenCalledOnce()
+    expect(api.get).toHaveBeenCalledWith('/articles/feed', getPayloadToCheck(page, tag))
+    await flushPromises()
+
+    const articles = wrapper.findAllComponents({ name: 'ArticlePreview' })
+    const pagination = wrapper.findComponent({ name: 'Pagination' })
+    const popularTags = wrapper.findComponent({ name: 'PopularTags' })
+    expect(articles).toHaveLength(0)
+    expect(pagination.exists()).toBeTruthy()
+    expect(pagination.props('pagesAmount')).toBeUndefined()
+    expect(popularTags.exists()).toBeTruthy()
+  })
+
   it('calls updateArticles when route query parameters change', async () => {
     let page = 1
     let tag = 'tag'
