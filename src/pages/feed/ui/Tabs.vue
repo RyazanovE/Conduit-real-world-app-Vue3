@@ -19,6 +19,7 @@ function navigate(query?: LocationQueryRaw) {
         <li v-if="currentUser !== null" class="nav-item">
           <button
             class="nav-link"
+            data-test="your-feed-button"
             :class="{ active: route.query.source === 'my-feed' }"
             @click="navigate({ source: 'my-feed' })"
           >
@@ -28,6 +29,7 @@ function navigate(query?: LocationQueryRaw) {
         <li class="nav-item">
           <button
             class="nav-link"
+            data-test="global-feed-button"
             :class="{ active: !route.query.tag && !route.query.source }"
             @click="navigate({ source: undefined })"
           >
@@ -35,7 +37,7 @@ function navigate(query?: LocationQueryRaw) {
           </button>
         </li>
         <li v-if="!!route.query.tag" class="nav-item">
-          <span class="nav-link active">
+          <span data-test="tag-link" class="nav-link active">
             <i class="ion-pound" /> {{ route.query.tag }}
           </span>
         </li>

@@ -5,15 +5,23 @@ import type { RouterLink } from 'vue-router'
 import ArticlePreview from '../ui/ArticlePreview.vue'
 import { anotherArticle, article } from './constants'
 import { api } from '@/app/api/_index'
-import { mockLocalStorage, token } from '@/../vitest.setup.ts'
-
-mockLocalStorage()
+import { authFetchOptions, clearLocalStorage, mockLocalStorage } from '@/../vitest.setup.ts'
 
 describe('articlePreview Component', () => {
-  let wrapper: VueWrapper<any>
+  let wrapper: VueWrapper<any> | null
 
   beforeEach(() => {
-    wrapper = mount(ArticlePreview, {
+    mockLocalStorage()
+  })
+
+  afterEach(() => {
+    wrapper = null
+    vitest.restoreAllMocks()
+    clearLocalStorage()
+  })
+
+  function createWrapper() {
+    return mount(ArticlePreview, {
       props: { article },
       global: {
         stubs: {
@@ -24,50 +32,48 @@ describe('articlePreview Component', () => {
         },
       },
     })
-  })
+  }
 
-  afterEach(() => {
-    wrapper.unmount()
-    vitest.restoreAllMocks()
-  })
-
-  const getByTestId = (testId: string) => wrapper.get(`[data-test="${testId}"]`)
+  const getByTestId = (testId: string) => wrapper?.get(`[data-test="${testId}"]`)
 
   describe('article props rendering', () => {
     it('correctly updates props interpolation', async () => {
-      expect(getByTestId('article-date').text()).toEqual(new Date(article.createdAt).toLocaleDateString(undefined, {
+      wrapper = createWrapper()
+      expect(getByTestId('article-date')?.text()).toEqual(new Date(article.createdAt).toLocaleDateString(undefined, {
         dateStyle: 'long',
       }))
-      expect(getByTestId('author-image').attributes().src).toEqual(article.author.image)
-      expect(getByTestId('author-username-link').text()).toEqual(article.author.username)
-      expect(getByTestId('article-title').text()).toEqual(article.title)
-      expect(getByTestId('article-description').text()).toEqual(article.description)
-      expect(getByTestId('tag-list').findAll('li').map(tag => tag.text())).toEqual(article.tagList)
-      expect(getByTestId('button-favorite').text()).toEqual(article.favoritesCount.toString())
+      expect(getByTestId('author-image')?.attributes().src).toEqual(article.author.image)
+      expect(getByTestId('author-username-link')?.text()).toEqual(article.author.username)
+      expect(getByTestId('article-title')?.text()).toEqual(article.title)
+      expect(getByTestId('article-description')?.text()).toEqual(article.description)
+      expect(getByTestId('tag-list')?.findAll('li').map(tag => tag.text())).toEqual(article.tagList)
+      expect(getByTestId('button-favorite')?.text()).toEqual(article.favoritesCount.toString())
 
       await wrapper.setProps({ article: anotherArticle })
 
-      expect(getByTestId('article-date').text()).toEqual(new Date(anotherArticle.createdAt).toLocaleDateString(undefined, {
+      expect(getByTestId('article-date')?.text()).toEqual(new Date(anotherArticle.createdAt).toLocaleDateString(undefined, {
         dateStyle: 'long',
       }))
-      expect(getByTestId('author-image').attributes().src).toEqual(anotherArticle.author.image)
-      expect(getByTestId('author-username-link').text()).toEqual(anotherArticle.author.username)
-      expect(getByTestId('article-title').text()).toEqual(anotherArticle.title)
-      expect(getByTestId('article-description').text()).toEqual(anotherArticle.description)
-      expect(getByTestId('tag-list').findAll('li').map(tag => tag.text())).toEqual(anotherArticle.tagList)
-      expect(getByTestId('button-favorite').text()).toEqual(anotherArticle.favoritesCount.toString())
+      expect(getByTestId('author-image')?.attributes().src).toEqual(anotherArticle.author.image)
+      expect(getByTestId('author-username-link')?.text()).toEqual(anotherArticle.author.username)
+      expect(getByTestId('article-title')?.text()).toEqual(anotherArticle.title)
+      expect(getByTestId('article-description')?.text()).toEqual(anotherArticle.description)
+      expect(getByTestId('tag-list')?.findAll('li').map(tag => tag.text())).toEqual(anotherArticle.tagList)
+      expect(getByTestId('button-favorite')?.text()).toEqual(anotherArticle.favoritesCount.toString())
     })
   })
 
   describe('button Rendering', () => {
     it('renders button with correct class based on favorited state', () => {
+      wrapper = createWrapper()
       const button = getByTestId('button-favorite')
-      expect(button.classes()).toContain(article.favorited ? 'btn-primary' : 'btn-outline-primary')
+      expect(button?.classes()).toContain(article.favorited ? 'btn-primary' : 'btn-outline-primary')
     })
   })
 
   describe('router-links', () => {
     it('have correct :to attribute', () => {
+      wrapper = createWrapper()
       const imgProfileLink = wrapper.getComponent<typeof RouterLink>('[data-test=\'img-profile-link\']')
       const usernameProfileLink = wrapper.getComponent<typeof RouterLink>('[data-test=\'author-username-link\']')
       const articleProfileLink = wrapper.getComponent<typeof RouterLink>('[data-test=\'article-profile-link\']')
@@ -80,29 +86,31 @@ describe('articlePreview Component', () => {
 
   describe('handling /favorite DELETE Request', () => {
     it('sends correct DELETE request on button click and emits event', async () => {
+      wrapper = createWrapper()
       vitest.spyOn(api, 'delete').mockResolvedValue({
         data: { ...article, favorited: !article.favorited },
         status: 200,
       })
 
-      await getByTestId('button-favorite').trigger('submit')
+      await getByTestId('button-favorite')?.trigger('submit')
 
       expect(api.delete).toHaveBeenCalledTimes(1)
-      expect(api.delete).toHaveBeenCalledWith(`/articles/${article.slug}/favorite`, { headers: { Authorization: `Token ${token}` } })
+      expect(api.delete).toHaveBeenCalledWith(`/articles/${article.slug}/favorite`, authFetchOptions)
       expect(wrapper.emitted().favorited).toEqual([[{ slug: article.slug, favorited: !article.favorited }]])
     })
 
     it('restores favorite state on incorrect DELETE response and emits event', async () => {
-      vitest.spyOn(console, 'error').mockImplementation(() => {})
+      wrapper = createWrapper()
+      vitest.spyOn(console, 'error').mockImplementation(() => { })
       vitest.spyOn(api, 'delete').mockRejectedValue({
         data: null,
         status: 500,
       })
 
-      await getByTestId('button-favorite').trigger('submit')
+      await getByTestId('button-favorite')?.trigger('submit')
 
       expect(api.delete).toHaveBeenCalledTimes(1)
-      expect(api.delete).toHaveBeenCalledWith(`/articles/${article.slug}/favorite`, { headers: { Authorization: `Token ${token}` } })
+      expect(api.delete).toHaveBeenCalledWith(`/articles/${article.slug}/favorite`, authFetchOptions)
       expect(wrapper.emitted().favorited).toEqual([
         [{ slug: article.slug, favorited: !article.favorited }],
         [{ slug: article.slug, favorited: article.favorited }],
@@ -112,6 +120,7 @@ describe('articlePreview Component', () => {
 
   describe('handling /favorite POST Request', () => {
     it('sends correct POST request on button click and emits event', async () => {
+      wrapper = createWrapper()
       await wrapper.setProps({ article: anotherArticle })
 
       vitest.spyOn(api, 'post').mockResolvedValue({
@@ -119,26 +128,27 @@ describe('articlePreview Component', () => {
         status: 200,
       })
 
-      await getByTestId('button-favorite').trigger('submit')
+      await getByTestId('button-favorite')?.trigger('submit')
 
       expect(api.post).toHaveBeenCalledTimes(1)
-      expect(api.post).toHaveBeenCalledWith(`/articles/${anotherArticle.slug}/favorite`, undefined, { headers: { Authorization: `Token ${token}` } })
+      expect(api.post).toHaveBeenCalledWith(`/articles/${anotherArticle.slug}/favorite`, undefined, authFetchOptions)
       expect(wrapper.emitted().favorited).toEqual([[{ slug: anotherArticle.slug, favorited: !anotherArticle.favorited }]])
     })
 
     it('restores favorite state on incorrect POST response and emits event', async () => {
-      vitest.spyOn(console, 'error').mockImplementation(() => {})
-      await wrapper.setProps({ article: anotherArticle })
+      wrapper = createWrapper()
+      vitest.spyOn(console, 'error').mockImplementation(() => { })
+      await wrapper?.setProps({ article: anotherArticle })
 
       vitest.spyOn(api, 'post').mockRejectedValue({
         data: null,
         status: 500,
       })
 
-      await getByTestId('button-favorite').trigger('submit')
+      await getByTestId('button-favorite')?.trigger('submit')
 
       expect(api.post).toHaveBeenCalledTimes(1)
-      expect(api.post).toHaveBeenCalledWith(`/articles/${anotherArticle.slug}/favorite`, undefined, { headers: { Authorization: `Token ${token}` } })
+      expect(api.post).toHaveBeenCalledWith(`/articles/${anotherArticle.slug}/favorite`, undefined, authFetchOptions)
       expect(wrapper.emitted().favorited).toEqual([
         [{ slug: anotherArticle.slug, favorited: !anotherArticle.favorited }],
         [{ slug: anotherArticle.slug, favorited: anotherArticle.favorited }],

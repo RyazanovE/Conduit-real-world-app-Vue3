@@ -42,7 +42,7 @@ async function postComment() {
 <template>
   <div class="col-xs-12 col-md-8 offset-md-2">
     <div v-if="currentUser !== null">
-      <form class="card comment-form" @submit.prevent="postComment">
+      <form data-test="post-comment-form" class="card comment-form" @submit.prevent="postComment">
         <div class="card-block">
           <textarea
             v-model="commentText"
@@ -50,6 +50,7 @@ async function postComment() {
             class="form-control"
             name="comment"
             placeholder="Write a comment..."
+            data-test="comment-textarea"
             rows="3"
           />
         </div>
@@ -58,6 +59,7 @@ async function postComment() {
             :src="currentUser.image"
             class="comment-author-img"
             alt=""
+            data-test="current-user-image"
           >
           <button
             class="btn btn-sm btn-primary"
@@ -68,14 +70,14 @@ async function postComment() {
         </div>
       </form>
     </div>
-    <div v-else class="row">
+    <div v-else data-test="empty-current-user-row" class="row">
       <div class="col-xs-12 col-md-8 offset-md-2">
         <p>
-          <router-link to="/login">
+          <router-link :to="{ name: 'login' }">
             Sign in
           </router-link>
           &nbsp; or &nbsp;
-          <router-link to="/register">
+          <router-link :to="{ name: 'register' }">
             Sign up
           </router-link>
           &nbsp; to add comments on this article.
@@ -83,34 +85,37 @@ async function postComment() {
       </div>
     </div>
 
-    <div v-for="comment in commentsResult?.data.comments" :key="comment.id" class="card">
+    <div v-for="comment in commentsResult?.data.comments" :key="comment.id" data-test="comment" class="card">
       <div class="card-block">
-        <p class="card-text">
+        <p data-test="comment-body" class="card-text">
           {{ comment.body }}
         </p>
       </div>
 
       <div class="card-footer">
         <router-link
-          :to="`/profile/${comment.author.username}`"
+          :to="{ name: 'profile', params: { username: comment.author.username } }"
           class="comment-author"
+          data-test="comment-author-image-link"
         >
           <img
             :src="comment.author.image"
             class="comment-author-img"
             alt=""
+            data-test="comment-author-image"
           >
         </router-link>
         &nbsp;
         <router-link
-          :to="`/profile/${comment.author.username}`"
+          :to="{ name: 'profile', params: { username: comment.author.username } }"
           class="comment-author"
+          data-test="comment-author-username-link"
         >
           {{ comment.author.username }}
         </router-link>
-        <span class="date-posted">{{ comment.createdAt }}</span>
-        <span v-if="comment.author.username === currentUser?.username" class="mod-options">
-          <form @submit.prevent="deleteComment(comment.id)">
+        <span class="date-posted" data-test="comment-created-date">{{ comment.createdAt }}</span>
+        <span v-if="comment.author.username === currentUser?.username" data-test="delete-comment" class="mod-options">
+          <form data-test="delete-comment-form" @submit.prevent="deleteComment(comment.id)">
             <button
               type="submit"
               style="border: none; outline: none; background-color: transparent;"

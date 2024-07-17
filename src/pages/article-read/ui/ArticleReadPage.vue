@@ -31,7 +31,9 @@ function onFavoritedArticle(favorited: boolean) {
   <div class="article-page">
     <div class="banner">
       <div class="container">
-        <h1>{{ articleResult?.data.article.title }}</h1>
+        <h1 data-test="article-title">
+          {{ articleResult?.data.article.title }}
+        </h1>
 
         <ArticleMeta
           v-if="articleResult?.data.article"
@@ -46,10 +48,13 @@ function onFavoritedArticle(favorited: boolean) {
       <div class="row article-content">
         <div class="col-md-12">
           <ul class="tag-list">
-            <p>{{ articleResult?.data.article.body }}</p>
+            <p data-test="article-body">
+              {{ articleResult?.data.article.body }}
+            </p>
             <li
               v-for="tag in articleResult?.data.article.tagList"
               :key="tag"
+              data-test="article-tag"
               class="tag-default tag-pill tag-outline"
             >
               {{ tag }}

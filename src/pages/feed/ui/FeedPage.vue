@@ -53,7 +53,7 @@ watchEffect(() => {
         <div class="col-md-9">
           <Tabs />
           <ArticlePreview
-            v-for="article in articlesResult?.data?.articles"
+            v-for="article in articlesResult?.data.articles"
             :key="article.slug"
             :article="article"
             @favorited="toggleFavorite"

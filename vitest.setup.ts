@@ -1,5 +1,3 @@
-import { type Router, createMemoryHistory, createRouter } from 'vue-router'
-
 interface MockLocalStorage {
   getItem: (key: string) => string | null
   setItem: (key: string, value: string) => void
@@ -43,14 +41,21 @@ const mockedLocalStorage: MockLocalStorage = (() => {
 
 export const token = 'some_token'
 
-export function mockLocalStorage() {
-  globalThis.localStorage = mockedLocalStorage
-  localStorage.setItem('user', JSON.stringify({ token }))
+export const user = {
+  email: 'email',
+  username: 'username',
+  bio: 'bio',
+  image: 'image',
+  token,
 }
 
-export function createMockRouter(routes = []): Router {
-  return createRouter({
-    history: createMemoryHistory(),
-    routes,
-  })
+export function mockLocalStorage() {
+  globalThis.localStorage = mockedLocalStorage
+  localStorage.setItem('user', JSON.stringify(user))
 }
+
+export function clearLocalStorage() {
+  globalThis.localStorage.clear()
+}
+
+export const authFetchOptions = { headers: { Authorization: `Token ${token}` } }
