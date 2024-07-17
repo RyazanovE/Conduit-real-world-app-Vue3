@@ -1,29 +1,37 @@
 import type { VueWrapper } from '@vue/test-utils'
 import { nextTick } from 'vue'
-import { mount } from '@vue/test-utils'
+import { shallowMount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vitest } from 'vitest'
 import Tabs from '../ui/Tabs.vue'
 import { clearLocalStorage, mockLocalStorage } from '@/../vitest.setup.ts'
 
-let currentUseRouteMock = {
-  query: {
-    source: '',
-  },
-}
-const push = vitest.fn()
+let wrapper: VueWrapper<any> | null
+
+const { useRouteMock, pushMock } = vitest.hoisted(() => {
+  return {
+    useRouteMock: vitest.fn(),
+    pushMock: vitest.fn(),
+  }
+})
 
 vitest.mock('vue-router', async (importOriginal) => {
   const actual = await importOriginal() as object
   return {
     ...actual,
-    useRouter: vitest.fn(() => ({ push })),
-    useRoute: vitest.fn(() => currentUseRouteMock),
+    useRouter: vitest.fn(() => ({ push: pushMock })),
+    useRoute: useRouteMock,
   }
 })
 
-describe('popularTags component', () => {
-  let wrapper: VueWrapper<any> | null
+function findByTestId(testId: string) {
+  return wrapper?.find(`[data-test="${testId}"]`)
+}
 
+function createWrapper() {
+  return shallowMount(Tabs)
+}
+
+describe('popularTags component', () => {
   beforeEach(() => {
     mockLocalStorage()
   })
@@ -34,15 +42,9 @@ describe('popularTags component', () => {
     vitest.restoreAllMocks()
   })
 
-  function createWrapper() {
-    return mount(Tabs)
-  }
-
-  const findByTestId = (testId: string) => wrapper?.find(`[data-test="${testId}"]`)
-
   describe('"Your Feed" button', () => {
     it('shows button with fullfilled current user without active class', async () => {
-      currentUseRouteMock = { query: { source: '' } }
+      useRouteMock.mockReturnValue({ query: { source: '' } })
       wrapper = createWrapper()
       await nextTick()
 
@@ -50,7 +52,7 @@ describe('popularTags component', () => {
       expect(findByTestId('your-feed-button')?.classes()).not.toContain('active')
     })
     it('shows button with fullfilled current user with active class', async () => {
-      currentUseRouteMock = { query: { source: 'my-feed' } }
+      useRouteMock.mockReturnValue({ query: { source: 'my-feed' } })
       wrapper = createWrapper()
       await nextTick()
 
@@ -59,21 +61,21 @@ describe('popularTags component', () => {
     })
     it('correctly navigates by click', async () => {
       const params = { someParams: 'someParams' }
-      currentUseRouteMock = { query: { source: '' }, params } as any
+      useRouteMock.mockReturnValue({ query: { source: '' }, params })
       wrapper = createWrapper()
       await nextTick()
 
       expect(findByTestId('your-feed-button')?.exists()).toBeTruthy()
       await (findByTestId('your-feed-button'))?.trigger('click')
 
-      expect(push).toHaveBeenCalledOnce()
-      expect(push).toHaveBeenCalledWith({ query: { source: 'my-feed' }, params })
+      expect(pushMock).toHaveBeenCalledOnce()
+      expect(pushMock).toHaveBeenCalledWith({ query: { source: 'my-feed' }, params })
     })
   })
 
   describe('"Global feed" button', () => {
     it('shows button with active class', async () => {
-      currentUseRouteMock = { query: {} } as any
+      useRouteMock.mockReturnValue({ query: {} })
       wrapper = createWrapper()
       await nextTick()
 
@@ -81,7 +83,7 @@ describe('popularTags component', () => {
       expect(findByTestId('global-feed-button')?.classes()).toContain('active')
     })
     it('shows button without active class with fullfilled query source', async () => {
-      currentUseRouteMock = { query: { source: 'my-feed' } }
+      useRouteMock.mockReturnValue({ query: { source: 'my-feed' } })
       wrapper = createWrapper()
       await nextTick()
 
@@ -89,7 +91,7 @@ describe('popularTags component', () => {
       expect(findByTestId('global-feed-button')?.classes()).not.toContain('active')
     })
     it('shows button without active class with fullfilled query tag', async () => {
-      currentUseRouteMock = { query: { tag: 'some-tag' } } as any
+      useRouteMock.mockReturnValue({ query: { tag: 'some-tag' } })
       wrapper = createWrapper()
       await nextTick()
 
@@ -98,21 +100,21 @@ describe('popularTags component', () => {
     })
     it('correctly navigates by click', async () => {
       const params = { someParams: 'someParams' }
-      currentUseRouteMock = { query: { source: '' }, params } as any
+      useRouteMock.mockReturnValue({ query: { source: '' }, params })
       wrapper = createWrapper()
       await nextTick()
 
       expect(findByTestId('global-feed-button')?.exists()).toBeTruthy()
       await (findByTestId('global-feed-button'))?.trigger('click')
 
-      expect(push).toHaveBeenCalledOnce()
-      expect(push).toHaveBeenCalledWith({ query: { source: undefined }, params })
+      expect(pushMock).toHaveBeenCalledOnce()
+      expect(pushMock).toHaveBeenCalledWith({ query: { source: undefined }, params })
     })
   })
   describe('"Tag link" span', () => {
     it('shows link with fullfiled query tag', async () => {
       const tag = 'some-tag'
-      currentUseRouteMock = { query: { tag } } as any
+      useRouteMock.mockReturnValue({ query: { tag } })
       wrapper = createWrapper()
       await nextTick()
 
@@ -120,7 +122,7 @@ describe('popularTags component', () => {
       expect(findByTestId('tag-link')?.text()).toBe(tag)
     })
     it('hides without fullfilled query tag', async () => {
-      currentUseRouteMock = { query: {} } as any
+      useRouteMock.mockReturnValue({ query: {} })
       wrapper = createWrapper()
       await nextTick()
 
