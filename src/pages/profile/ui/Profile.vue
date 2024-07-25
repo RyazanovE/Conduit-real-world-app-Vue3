@@ -10,7 +10,7 @@ import { Pagination } from '@/shared/ui'
 import type { Article } from '@/shared/models'
 import { feedApiService } from '@/shared/api'
 
-  type tabNames = 'profile' | 'profile-favorites'
+type tabNames = 'profile' | 'profile-favorites'
 
 const route = useRoute()
 
@@ -37,16 +37,6 @@ async function updatePage() {
   updateArticles()
 }
 
-function onTabChanged(tabName: tabNames) {
-  updateArticles(tabName)
-}
-
-function onAuthorFollowed(following: boolean) {
-  if (profileResult.value) {
-    profileResult.value.data.profile.following = following
-  }
-}
-
 function updateArticles(tabName: tabNames = 'profile') {
   articlesResult.value = null
 
@@ -57,13 +47,25 @@ function updateArticles(tabName: tabNames = 'profile') {
   fetchArticles({ page, author, favorited })
 }
 
-function toggleFavorite({ slug, favorited }: Partial<Article>) {
-  const articles = articlesResult.value?.data.articles
-  const index = articles?.findIndex(article => article.slug === slug)
+function onTabChanged(tabName: tabNames) {
+  updateArticles(tabName)
+}
 
-  if (articles && index !== undefined && index !== -1) {
+function onAuthorFollowed(following: boolean) {
+  if (profileResult.value) {
+    profileResult.value.data.profile.following = following
+  }
+}
+
+function onFavorited({ slug, favorited }: Partial<Article>) {
+  const articles = articlesResult.value?.data.articles ?? []
+  const index = articles.findIndex(article => article.slug === slug)
+
+  if (articles && index !== -1) {
     articles[index].favorited = !!favorited
-    articles[index].favoritesCount = favorited ? articles[index].favoritesCount + 1 : articles[index].favoritesCount - 1
+    articles[index].favoritesCount = favorited
+      ? articles[index].favoritesCount + 1
+      : articles[index].favoritesCount - 1
   }
 }
 </script>
@@ -82,7 +84,7 @@ function toggleFavorite({ slug, favorited }: Partial<Article>) {
             v-for="article in articlesResult?.data.articles"
             :key="article.slug"
             :article="article"
-            @favorited="toggleFavorite"
+            @favorited="onFavorited"
           />
           <Pagination
             :pages-amount="articlesResult?.data.articlesCount"

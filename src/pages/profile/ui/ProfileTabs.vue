@@ -12,20 +12,22 @@ const profileFavoritesPageName = 'profile-favorites'
     <ul class="nav nav-pills outline-active">
       <li class="nav-item">
         <router-link
+          data-test="my-articles-link"
           :to="{ name: profilePageName, params: { username: route.params.username } }"
           class="nav-link"
           :class="{ active: route.name === profilePageName }"
-          @click="emits(&quot;tabChanged&quot;, profilePageName)"
+          @click="emits('tabChanged', profilePageName)"
         >
           My Articles
         </router-link>
       </li>
       <li class="nav-item">
         <router-link
+          data-test="favorited-articles-link"
           :to="{ name: profileFavoritesPageName, params: { username: route.params.username } }"
           class="nav-link"
           :class="{ active: route.name === profileFavoritesPageName }"
-          @click="emits(&quot;tabChanged&quot;, profileFavoritesPageName)"
+          @click="emits('tabChanged', profileFavoritesPageName)"
         >
           Favorited Articles
         </router-link>

@@ -6,7 +6,7 @@ import ArticleEditPage from '../ui/ArticleEditPage.vue'
 import TagsInput from '../ui/TagsInput.vue'
 import { authFetchOptions, clearLocalStorage, mockLocalStorage } from '@/../vitest.setup.ts'
 import { api } from '@/app/api/_index'
-import { anotherArticle, article } from '@/features/article-preview/tests/constants'
+import { anotherArticle, article } from '@/shared/test/constants'
 
 const push = vitest.fn()
 

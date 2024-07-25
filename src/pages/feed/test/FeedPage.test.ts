@@ -1,10 +1,10 @@
 import type { VueWrapper } from '@vue/test-utils'
-import { flushPromises, mount, shallowMount } from '@vue/test-utils'
+import { flushPromises, shallowMount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { LocationQueryRaw, RouteRecordRaw, Router } from 'vue-router'
 import { createRouter, createWebHistory } from 'vue-router'
 import FeedPage from '../ui/FeedPage.vue'
-import { anotherArticle, article } from '@/features/article-preview/tests/constants'
+import { anotherArticle, article } from '@/shared/test/constants'
 import { api } from '@/app/api/_index'
 import type { Article } from '@/shared/models'
 

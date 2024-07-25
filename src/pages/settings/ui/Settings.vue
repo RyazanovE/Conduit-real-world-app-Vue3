@@ -15,12 +15,10 @@ async function onSubmit(formValues: UpdateUser) {
   try {
     validateForm(formValues)
 
-    const { status, data } = await settingsService.updateUser(formValues)
+    const { data } = await settingsService.updateUser(formValues)
 
-    if (status === 200) {
-      setUser(data.user)
-      router.push({ name: 'profile', params: { username: data.user.username } })
-    }
+    setUser(data.user)
+    router.push({ name: 'profile', params: { username: data.user.username } })
   }
   catch (error) {
     console.error(error)
@@ -60,13 +58,14 @@ function logout() {
             Your Settings
           </h1>
           <ul class="error-messages">
-            <li v-for="error in formErrors" :key="error">
+            <li v-for="error in formErrors" :key="error" data-test="error-message">
               {{ error }}
             </li>
           </ul>
           <SettingsForm @submit="onSubmit" />
           <hr>
           <button
+            data-test="logout-button"
             class="btn btn-outline-danger"
             @click="logout"
           >

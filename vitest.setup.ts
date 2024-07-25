@@ -18,6 +18,9 @@ const mockedLocalStorage: MockLocalStorage = (() => {
         store[key] = value
         _length++
       }
+      else {
+        store[key] = value
+      }
     },
     removeItem: (key: string): void => {
       if (store[key]) {

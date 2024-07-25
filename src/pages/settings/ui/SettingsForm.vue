@@ -1,5 +1,5 @@
 <script setup lang='ts'>
-import { reactive, watch } from 'vue'
+import { onMounted, reactive } from 'vue'
 import { useUserSession } from '@/shared/hooks'
 import type { UpdateUser } from '@/shared/models'
 
@@ -15,15 +15,11 @@ const formValues = reactive<UpdateUser>({
   password: '',
 })
 
-watch(() => currentUser.value, (newValue) => {
-  if (newValue) {
-    const { bio, email, image, username } = newValue
-    formValues.bio = bio
-    formValues.email = email
-    formValues.image = image
-    formValues.username = username
+onMounted(() => {
+  if (currentUser.value) {
+    Object.assign(formValues, currentUser.value)
   }
-}, { deep: true })
+})
 </script>
 
 <template>
@@ -32,6 +28,7 @@ watch(() => currentUser.value, (newValue) => {
       <fieldset class="form-group">
         <input
           v-model="formValues.image"
+          data-test="image-url-input"
           class="form-control"
           type="text"
           placeholder="URL of profile picture"
@@ -40,6 +37,7 @@ watch(() => currentUser.value, (newValue) => {
       <fieldset class="form-group">
         <input
           v-model="formValues.username"
+          data-test="username-input"
           class="form-control form-control-lg"
           type="text"
           placeholder="Your Name"
@@ -48,6 +46,7 @@ watch(() => currentUser.value, (newValue) => {
       <fieldset class="form-group">
         <textarea
           v-model="formValues.bio"
+          data-test="bio-input"
           class="form-control form-control-lg"
           rows="8"
           placeholder="Short bio about you"
@@ -56,6 +55,7 @@ watch(() => currentUser.value, (newValue) => {
       <fieldset class="form-group">
         <input
           v-model="formValues.email"
+          data-test="email-input"
           class="form-control form-control-lg"
           type="text"
           placeholder="Email"
@@ -64,12 +64,17 @@ watch(() => currentUser.value, (newValue) => {
       <fieldset class="form-group">
         <input
           v-model="formValues.password"
+          data-test="password-input"
           class="form-control form-control-lg"
           type="password"
           placeholder="New Password"
         >
       </fieldset>
-      <button class="btn btn-lg btn-primary pull-xs-right">
+      <button
+        data-test="submit-button"
+        type="submit"
+        class="btn btn-lg btn-primary pull-xs-right"
+      >
         Update Settings
       </button>
     </fieldset>

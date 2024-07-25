@@ -6,7 +6,7 @@ import Comments from '../ui/Comments.vue'
 import { comments } from './constants'
 import { authFetchOptions, clearLocalStorage, mockLocalStorage, user } from '@/../vitest.setup.ts'
 import { api } from '@/app/api/_index'
-import { article } from '@/features/article-preview/tests/constants'
+import { article } from '@/shared/test/constants'
 
 const push = vitest.fn()
 

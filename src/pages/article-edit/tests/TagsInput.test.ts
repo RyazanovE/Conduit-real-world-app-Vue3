@@ -1,5 +1,5 @@
 import type { VueWrapper } from '@vue/test-utils'
-import { flushPromises, mount } from '@vue/test-utils'
+import { flushPromises, shallowMount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vitest } from 'vitest'
 import TagsInput from '../ui/TagsInput.vue'
 import { clearLocalStorage, mockLocalStorage } from '@/../vitest.setup.ts'
@@ -19,7 +19,7 @@ describe('tagsInput Component', () => {
   })
 
   function createWrapper() {
-    return mount(TagsInput, { props: { tags } })
+    return shallowMount(TagsInput, { props: { tags } })
   }
 
   const getByTestId = (testId: string) => wrapper?.get(`[data-test="${testId}"]`)

@@ -1,9 +1,9 @@
 import type { VueWrapper } from '@vue/test-utils'
-import { flushPromises, mount, shallowMount } from '@vue/test-utils'
+import { flushPromises, shallowMount } from '@vue/test-utils'
 import { afterEach, describe, expect, it, vitest } from 'vitest'
 import type { RouterLink } from 'vue-router'
 import PopularTags from '../ui/PopularTags.vue'
-import { article } from '@/features/article-preview/tests/constants'
+import { article } from '@/shared/test/constants'
 import { api } from '@/app/api/_index'
 
 let wrapper: VueWrapper<any> | null

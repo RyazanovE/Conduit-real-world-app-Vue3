@@ -3,7 +3,7 @@ import { flushPromises, mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vitest } from 'vitest'
 import ArticleReadPage from '../ui/ArticleReadPage.vue'
 import { authFetchOptions, clearLocalStorage, mockLocalStorage } from '@/../vitest.setup.ts'
-import { article } from '@/features/article-preview/tests/constants'
+import { article } from '@/shared/test/constants'
 import { api } from '@/app/api/_index'
 
 const push = vitest.fn()

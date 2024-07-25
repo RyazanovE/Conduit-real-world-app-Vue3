@@ -20,10 +20,12 @@ export function useUserSession() {
 
   const setUser = (user: User) => {
     localStorage.setItem('user', JSON.stringify(user))
+    updateUserFromSession()
   }
 
   const deleteUser = () => {
     localStorage.removeItem('user')
+    updateUserFromSession()
   }
 
   onMounted(() => {
