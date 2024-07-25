@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useUserSession } from '../hooks'
+import { RouteNames } from '@/app/routes'
 
 const { currentUser, route } = useUserSession()
 </script>
@@ -7,7 +8,11 @@ const { currentUser, route } = useUserSession()
 <template>
   <nav class="navbar navbar-light">
     <div class="container">
-      <router-link class="navbar-brand" :to="{ name: 'feed' }" prefetch="intent">
+      <router-link
+        class="navbar-brand"
+        prefetch="intent"
+        :to="{ name: RouteNames.FEED }"
+      >
         conduit
       </router-link>
       <ul class="nav navbar-nav pull-xs-right">
@@ -15,8 +20,8 @@ const { currentUser, route } = useUserSession()
           <router-link
             prefetch="intent"
             class="nav-link"
-            :class="{ active: route.name === 'feed' }"
-            :to="{ name: 'feed' }"
+            :class="{ active: route.name === RouteNames.FEED }"
+            :to="{ name: RouteNames.FEED }"
           >
             Home
           </router-link>
@@ -26,8 +31,8 @@ const { currentUser, route } = useUserSession()
             <router-link
               prefetch="intent"
               class="nav-link"
-              :class="{ active: route.name === 'login' }"
-              :to="{ name: 'login' }"
+              :class="{ active: route.name === RouteNames.LOGIN }"
+              :to="{ name: RouteNames.LOGIN }"
             >
               Sign in
             </router-link>
@@ -36,8 +41,8 @@ const { currentUser, route } = useUserSession()
             <router-link
               prefetch="intent"
               class="nav-link"
-              :class="{ active: route.name === 'register' }"
-              :to="{ name: 'register' }"
+              :class="{ active: route.name === RouteNames.REGISTER }"
+              :to="{ name: RouteNames.REGISTER }"
             >
               Sign up
             </router-link>
@@ -48,8 +53,8 @@ const { currentUser, route } = useUserSession()
             <router-link
               prefetch="intent"
               class="nav-link"
-              :class="{ active: route.name === 'editor' && !route.params.slug }"
-              to="/editor"
+              :class="{ active: route.name === RouteNames.EDITOR && !route.params.slug }"
+              :to="{ name: RouteNames.EDITOR }"
             >
               <i class="ion-compose" />&nbsp;New Article
             </router-link>
@@ -58,8 +63,8 @@ const { currentUser, route } = useUserSession()
             <router-link
               prefetch="intent"
               class="nav-link"
-              :class="{ active: route.name === 'settings' }"
-              to="/settings"
+              :class="{ active: route.name === RouteNames.SETTINGS }"
+              :to="{ name: RouteNames.SETTINGS }"
             >
               <i class="ion-gear-a" />&nbsp;Settings
             </router-link>
@@ -69,7 +74,7 @@ const { currentUser, route } = useUserSession()
               prefetch="intent"
               class="nav-link"
               :class="{ active: false }"
-              :to="`/profile/${currentUser?.username}`"
+              :to="{ name: RouteNames.PROFILE, params: { username: currentUser?.username } }"
             >
               <template v-if="currentUser?.image">
                 <img

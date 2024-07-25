@@ -10,7 +10,7 @@ import { Pagination } from '@/shared/ui'
 import type { Article } from '@/shared/models'
 import { feedApiService } from '@/shared/api'
 
-type tabNames = 'profile' | 'profile-favorites'
+type TabNames = 'profile' | 'profile-favorites'
 
 const route = useRoute()
 
@@ -37,7 +37,7 @@ async function updatePage() {
   updateArticles()
 }
 
-function updateArticles(tabName: tabNames = 'profile') {
+function updateArticles(tabName: TabNames = 'profile') {
   articlesResult.value = null
 
   const page = Number(route.query.page ?? 1)
@@ -47,7 +47,7 @@ function updateArticles(tabName: tabNames = 'profile') {
   fetchArticles({ page, author, favorited })
 }
 
-function onTabChanged(tabName: tabNames) {
+function onTabChanged(tabName: TabNames) {
   updateArticles(tabName)
 }
 

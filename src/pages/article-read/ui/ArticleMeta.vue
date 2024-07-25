@@ -3,8 +3,13 @@ import { useRouter } from 'vue-router'
 import { useUserSession } from '@/shared/hooks'
 import type { Article } from '@/shared/models'
 import { articleReadService } from '@/shared/api'
+import { RouteNames } from '@/app/routes'
 
-const props = defineProps<{ article: Article }>()
+interface ArticleMetaProps {
+  article: Article
+}
+
+const props = defineProps<ArticleMetaProps>()
 const emits = defineEmits<{
   (e: 'followedAuthor', payload: boolean): void
   (e: 'favoritedArticle', payload: boolean): void
@@ -15,11 +20,8 @@ const router = useRouter()
 
 async function handleDelete() {
   try {
-    const { status } = await articleReadService.deleteArticle(props.article.slug)
-
-    if (status === 204) {
-      router.push({ name: 'feed' })
-    }
+    await articleReadService.deleteArticle(props.article.slug)
+    router.push({ name: 'feed' })
   }
   catch (error) {
     console.error(error)
@@ -64,19 +66,19 @@ async function toggleFavorite() {
 <template>
   <form @submit.prevent>
     <div class="article-meta">
-      <router-link data-test="image-profile-link" :to="{ name: 'profile', params: { username: props.article.author.username } }">
+      <router-link data-test="image-profile-link" :to="{ name: RouteNames.PROFILE, params: { username: props.article.author.username } }">
         <img :src="props.article.author.image" alt="">
       </router-link>
 
       <div class="info">
-        <router-link data-test="username-profile-link" :to="{ name: 'profile', params: { username: props.article.author.username } }" class="author">
+        <router-link data-test="username-profile-link" :to="{ name: RouteNames.PROFILE, params: { username: props.article.author.username } }" class="author">
           {{ props.article.author.username }}
         </router-link>
         <span data-test="article-date" class="date">{{ props.article.createdAt }}</span>
       </div>
 
       <div v-if="props.article.author.username === currentUser?.username" data-test="edit-article-block" style="display: inline">
-        <router-link data-test="edit-article-link" :to="{ name: 'editor', params: { slug: props.article.slug } }" class="btn btn-sm btn-outline-secondary">
+        <router-link data-test="edit-article-link" :to="{ name: RouteNames.EDITOR, params: { slug: props.article.slug } }" class="btn btn-sm btn-outline-secondary">
           <i class="ion-edit" /> Edit Article
         </router-link>
         &nbsp;&nbsp;

@@ -24,7 +24,7 @@ vitest.mock('vue-router', async (importOriginal) => {
 })
 
 function findByTestId(testId: string) {
-  return wrapper?.find(`[data-test="${testId}"]`)
+  return wrapper!.find(`[data-test="${testId}"]`)
 }
 
 function createWrapper() {
@@ -48,16 +48,16 @@ describe('popularTags component', () => {
       wrapper = createWrapper()
       await nextTick()
 
-      expect(findByTestId('your-feed-button')?.exists()).toBeTruthy()
-      expect(findByTestId('your-feed-button')?.classes()).not.toContain('active')
+      expect(findByTestId('your-feed-button').exists()).toBeTruthy()
+      expect(findByTestId('your-feed-button').classes()).not.toContain('active')
     })
     it('shows button with fullfilled current user with active class', async () => {
       useRouteMock.mockReturnValue({ query: { source: 'my-feed' } })
       wrapper = createWrapper()
       await nextTick()
 
-      expect(findByTestId('your-feed-button')?.exists()).toBeTruthy()
-      expect(findByTestId('your-feed-button')?.classes()).toContain('active')
+      expect(findByTestId('your-feed-button').exists()).toBeTruthy()
+      expect(findByTestId('your-feed-button').classes()).toContain('active')
     })
     it('correctly navigates by click', async () => {
       const params = { someParams: 'someParams' }
@@ -65,8 +65,8 @@ describe('popularTags component', () => {
       wrapper = createWrapper()
       await nextTick()
 
-      expect(findByTestId('your-feed-button')?.exists()).toBeTruthy()
-      await (findByTestId('your-feed-button'))?.trigger('click')
+      expect(findByTestId('your-feed-button').exists()).toBeTruthy()
+      await (findByTestId('your-feed-button')).trigger('click')
 
       expect(pushMock).toHaveBeenCalledOnce()
       expect(pushMock).toHaveBeenCalledWith({ query: { source: 'my-feed' }, params })
@@ -79,24 +79,24 @@ describe('popularTags component', () => {
       wrapper = createWrapper()
       await nextTick()
 
-      expect(findByTestId('global-feed-button')?.exists()).toBeTruthy()
-      expect(findByTestId('global-feed-button')?.classes()).toContain('active')
+      expect(findByTestId('global-feed-button').exists()).toBeTruthy()
+      expect(findByTestId('global-feed-button').classes()).toContain('active')
     })
     it('shows button without active class with fullfilled query source', async () => {
       useRouteMock.mockReturnValue({ query: { source: 'my-feed' } })
       wrapper = createWrapper()
       await nextTick()
 
-      expect(findByTestId('global-feed-button')?.exists()).toBeTruthy()
-      expect(findByTestId('global-feed-button')?.classes()).not.toContain('active')
+      expect(findByTestId('global-feed-button').exists()).toBeTruthy()
+      expect(findByTestId('global-feed-button').classes()).not.toContain('active')
     })
     it('shows button without active class with fullfilled query tag', async () => {
       useRouteMock.mockReturnValue({ query: { tag: 'some-tag' } })
       wrapper = createWrapper()
       await nextTick()
 
-      expect(findByTestId('global-feed-button')?.exists()).toBeTruthy()
-      expect(findByTestId('global-feed-button')?.classes()).not.toContain('active')
+      expect(findByTestId('global-feed-button').exists()).toBeTruthy()
+      expect(findByTestId('global-feed-button').classes()).not.toContain('active')
     })
     it('correctly navigates by click', async () => {
       const params = { someParams: 'someParams' }
@@ -104,8 +104,8 @@ describe('popularTags component', () => {
       wrapper = createWrapper()
       await nextTick()
 
-      expect(findByTestId('global-feed-button')?.exists()).toBeTruthy()
-      await (findByTestId('global-feed-button'))?.trigger('click')
+      expect(findByTestId('global-feed-button').exists()).toBeTruthy()
+      await (findByTestId('global-feed-button')).trigger('click')
 
       expect(pushMock).toHaveBeenCalledOnce()
       expect(pushMock).toHaveBeenCalledWith({ query: { source: undefined }, params })
@@ -118,15 +118,15 @@ describe('popularTags component', () => {
       wrapper = createWrapper()
       await nextTick()
 
-      expect(findByTestId('tag-link')?.exists()).toBeTruthy()
-      expect(findByTestId('tag-link')?.text()).toBe(tag)
+      expect(findByTestId('tag-link').exists()).toBeTruthy()
+      expect(findByTestId('tag-link').text()).toBe(tag)
     })
     it('hides without fullfilled query tag', async () => {
       useRouteMock.mockReturnValue({ query: {} })
       wrapper = createWrapper()
       await nextTick()
 
-      expect(findByTestId('tag-link')?.exists()).toBeFalsy()
+      expect(findByTestId('tag-link').exists()).toBeFalsy()
     })
   })
 })

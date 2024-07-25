@@ -6,6 +6,7 @@ import TagsInput from './TagsInput.vue'
 import type { Article } from '@/shared/models'
 import { useFetch } from '@/shared/hooks'
 import { articleReadService } from '@/shared/api'
+import { RouteNames } from '@/app/routes'
 
 const router = useRouter()
 const route = useRoute()
@@ -22,9 +23,7 @@ const form = reactive<Partial<Article>>({
 })
 
 onMounted(() => {
-  if (route.params.slug) {
-    fetchData(String(route.params.slug))
-  }
+  fetchData(String(route.params.slug))
 })
 
 watch(() => articleResult.value?.data?.article, (newValue) => {
@@ -44,11 +43,9 @@ async function submitForm() {
     const promise = route.params.slug
       ? articleReadService.editArticle(String(route.params.slug), form)
       : articleReadService.createArticle(form)
-    const { status, data } = await promise
+    const { data } = await promise
 
-    if ([200, 201].includes(status)) {
-      router.push({ name: 'article', params: { slug: data.article.slug } })
-    }
+    router.push({ name: RouteNames.ARTICLE, params: { slug: data.article.slug } })
   }
   catch (error) {
     console.error('Error submitting form', error)

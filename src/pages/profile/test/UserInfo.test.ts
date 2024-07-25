@@ -9,14 +9,14 @@ import { api } from '@/app/api/_index'
 
 let wrapper: VueWrapper<any> | null
 
+vitest.spyOn(console, 'error').mockImplementation(() => { })
+
 const { useRouteMock, pushMock } = vitest.hoisted(() => {
   return {
     useRouteMock: vitest.fn(),
     pushMock: vitest.fn(),
   }
 })
-
-vitest.spyOn(console, 'error').mockImplementation(() => { })
 
 vitest.mock('vue-router', async (importOriginal) => {
   const actual = await importOriginal() as object
@@ -33,7 +33,7 @@ function createWrapper(props = {} as any) {
 }
 
 function findByTestId(testId: string) {
-  return wrapper?.find(`[data-test="${testId}"]`)
+  return wrapper!.find(`[data-test="${testId}"]`)
 }
 
 describe('userInfo Component', () => {
@@ -49,32 +49,32 @@ describe('userInfo Component', () => {
 
   it('correctly fullfils props', async () => {
     useRouteMock.mockReturnValue({ params: {} })
-    wrapper = createWrapper({ user: mockProfileData })
+    wrapper = createWrapper({ user: JSON.parse(JSON.stringify(mockProfileData)) })
 
     const userImage = findByTestId('user-image')
     const usernameHeader = findByTestId('username-header')
     const bioParagraph = findByTestId('bio-paragraph')
-    expect(userImage?.exists()).toBeTruthy()
-    expect(userImage!.attributes('src')).toBe(mockProfileData.image)
-    expect(usernameHeader?.exists()).toBeTruthy()
-    expect(usernameHeader!.text()).toBe(mockProfileData.username)
-    expect(bioParagraph?.exists()).toBeTruthy()
-    expect(bioParagraph!.text()).toBe(mockProfileData.bio)
+    expect(userImage.exists()).toBeTruthy()
+    expect(userImage.attributes('src')).toBe(mockProfileData.image)
+    expect(usernameHeader.exists()).toBeTruthy()
+    expect(usernameHeader.text()).toBe(mockProfileData.username)
+    expect(bioParagraph.exists()).toBeTruthy()
+    expect(bioParagraph.text()).toBe(mockProfileData.bio)
   })
   it('correctly renders edit/follow buttons on random user page', async () => {
     useRouteMock.mockReturnValue({ params: { username: 'not-my-username' } })
-    wrapper = createWrapper({ user: mockProfileData })
+    wrapper = createWrapper({ user: JSON.parse(JSON.stringify(mockProfileData)) })
 
-    expect(findByTestId('follow-button')?.exists()).toBeTruthy()
-    expect(findByTestId('edit-profile-button')?.exists()).toBeFalsy()
+    expect(findByTestId('follow-button').exists()).toBeTruthy()
+    expect(findByTestId('edit-profile-button').exists()).toBeFalsy()
   })
   it('correctly renders edit/follow buttons on my-profile page', async () => {
     useRouteMock.mockReturnValue({ params: { username: user.username } })
-    wrapper = createWrapper({ user: mockProfileData })
+    wrapper = createWrapper({ user: JSON.parse(JSON.stringify(mockProfileData)) })
     await nextTick()
 
-    expect(findByTestId('follow-button')?.exists()).toBeFalsy()
-    expect(findByTestId('edit-profile-button')?.exists()).toBeTruthy()
+    expect(findByTestId('follow-button').exists()).toBeFalsy()
+    expect(findByTestId('edit-profile-button').exists()).toBeTruthy()
   })
   it('correctly renders followButtonName by changing props and emits event', async () => {
     useRouteMock.mockReturnValue({ params: { username: 'not-my-username' } })
@@ -84,11 +84,11 @@ describe('userInfo Component', () => {
     const deleteMethod = vitest.spyOn(api, 'delete').mockResolvedValue(() => ({
       status: 200,
     }))
-    wrapper = createWrapper({ user: mockProfileData })
+    wrapper = createWrapper({ user: JSON.parse(JSON.stringify(mockProfileData)) })
 
-    expect(findByTestId('follow-button')?.exists()).toBeTruthy()
-    expect(findByTestId('follow-button')!.text()).toBe(`Follow ${mockProfileData.username}`)
-    await findByTestId('follow-button')!.trigger('click')
+    expect(findByTestId('follow-button').exists()).toBeTruthy()
+    expect(findByTestId('follow-button').text()).toBe(`Follow ${mockProfileData.username}`)
+    await findByTestId('follow-button').trigger('click')
     expect(post).toHaveBeenCalledOnce()
     expect(post).toHaveBeenCalledWith(`/profiles/${mockProfileData.username}/follow`, undefined, authFetchOptions)
     expect(deleteMethod).not.toHaveBeenCalled()
@@ -97,10 +97,10 @@ describe('userInfo Component', () => {
 
     post.mockReset()
 
-    await wrapper.setProps({ user: { ...mockProfileData, following: true } })
-    expect(findByTestId('follow-button')?.exists()).toBeTruthy()
-    expect(findByTestId('follow-button')!.text()).toBe(`Unfollow ${mockProfileData.username}`)
-    await findByTestId('follow-button')!.trigger('click')
+    await wrapper.setProps({ user: { ...JSON.parse(JSON.stringify(mockProfileData)), following: true } })
+    expect(findByTestId('follow-button').exists()).toBeTruthy()
+    expect(findByTestId('follow-button').text()).toBe(`Unfollow ${mockProfileData.username}`)
+    await findByTestId('follow-button').trigger('click')
     expect(deleteMethod).toHaveBeenCalledOnce()
     expect(deleteMethod).toHaveBeenCalledWith(`/profiles/${mockProfileData.username}/follow`, authFetchOptions)
     expect(post).not.toHaveBeenCalled()
@@ -115,15 +115,15 @@ describe('userInfo Component', () => {
     vitest.spyOn(api, 'delete').mockRejectedValueOnce(() => ({
       status: 500,
     }))
-    wrapper = createWrapper({ user: mockProfileData })
-    await findByTestId('follow-button')!.trigger('click')
+    wrapper = createWrapper({ user: JSON.parse(JSON.stringify(mockProfileData)) })
+    await findByTestId('follow-button').trigger('click')
     expect(wrapper.emitted('followedAuthor')?.length).toBe(2)
     expect(wrapper.emitted('followedAuthor')![0]![0]).toBe(true)
     expect(wrapper.emitted('followedAuthor')![1]![0]).toBe(false)
 
     post.mockReset()
 
-    await wrapper.setProps({ user: { ...mockProfileData, following: true } })
+    await wrapper.setProps({ user: { ...JSON.parse(JSON.stringify(mockProfileData)), following: true } })
     await findByTestId('follow-button')!.trigger('click')
     expect(wrapper.emitted('followedAuthor')?.length).toBe(4)
     expect(wrapper.emitted('followedAuthor')![2]![0]).toBe(false)

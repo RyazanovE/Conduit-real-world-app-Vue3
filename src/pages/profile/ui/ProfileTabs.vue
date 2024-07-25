@@ -1,10 +1,9 @@
 <script setup lang="ts">
+import { RouteNames } from '@/app/routes'
 import { useUserSession } from '@/shared/hooks'
 
 const emits = defineEmits(['tabChanged'])
 const { route } = useUserSession()
-const profilePageName = 'profile'
-const profileFavoritesPageName = 'profile-favorites'
 </script>
 
 <template>
@@ -13,10 +12,10 @@ const profileFavoritesPageName = 'profile-favorites'
       <li class="nav-item">
         <router-link
           data-test="my-articles-link"
-          :to="{ name: profilePageName, params: { username: route.params.username } }"
+          :to="{ name: RouteNames.PROFILE, params: { username: route.params.username } }"
           class="nav-link"
-          :class="{ active: route.name === profilePageName }"
-          @click="emits('tabChanged', profilePageName)"
+          :class="{ active: route.name === RouteNames.PROFILE }"
+          @click="emits('tabChanged', RouteNames.PROFILE)"
         >
           My Articles
         </router-link>
@@ -24,10 +23,10 @@ const profileFavoritesPageName = 'profile-favorites'
       <li class="nav-item">
         <router-link
           data-test="favorited-articles-link"
-          :to="{ name: profileFavoritesPageName, params: { username: route.params.username } }"
+          :to="{ name: RouteNames.PROFILE_FAVORITES, params: { username: route.params.username } }"
           class="nav-link"
-          :class="{ active: route.name === profileFavoritesPageName }"
-          @click="emits('tabChanged', profileFavoritesPageName)"
+          :class="{ active: route.name === RouteNames.PROFILE_FAVORITES }"
+          @click="emits('tabChanged', RouteNames.PROFILE_FAVORITES)"
         >
           Favorited Articles
         </router-link>

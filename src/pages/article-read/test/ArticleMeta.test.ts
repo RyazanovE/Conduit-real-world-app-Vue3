@@ -6,27 +6,32 @@ import { nextTick } from 'vue'
 import ArticleMeta from '../ui/ArticleMeta.vue'
 import { clearLocalStorage, mockLocalStorage, user } from '@/../vitest.setup.ts'
 import { article } from '@/shared/test/constants'
+import { routerLinkStub } from '@/shared/test'
+import { RouteNames } from '@/app/routes'
 
-const push = vitest.fn()
+let wrapper: VueWrapper<any> | null
 
 vitest.mock('vue-router', async (importOriginal) => {
   const actual = await importOriginal() as object
+
   return {
     ...actual,
-    useRoute: vitest.fn(() => ({
-      params: {
-        slug: article.slug,
-      },
-    })),
-    useRouter: vitest.fn(() => ({
-      push,
-    })),
+    useRoute: vitest.fn(() => ({ params: { slug: article.slug } })),
   }
 })
 
-describe('articleMeta component', () => {
-  let wrapper: VueWrapper<any> | null
+function createWrapper(props = {} as any) {
+  return mount(ArticleMeta, {
+    props,
+    global: {
+      stubs: {
+        ...routerLinkStub,
+      },
+    },
+  })
+}
 
+describe('articleMeta component', () => {
   beforeEach(() => {
     mockLocalStorage()
   })
@@ -37,21 +42,7 @@ describe('articleMeta component', () => {
     vitest.restoreAllMocks()
   })
 
-  const getByTestId = (testId: string) => wrapper?.get(`[data-test="${testId}"]`)
-
-  function createWrapper(props = {} as any) {
-    return mount(ArticleMeta, {
-      props,
-      global: {
-        stubs: {
-          'router-link': {
-            template: '<a data-test="img-profile-link" :href="to"><slot></slot></a>',
-            props: ['to'],
-          },
-        },
-      },
-    })
-  }
+  const getByTestId = (testId: string) => wrapper!.get(`[data-test="${testId}"]`)
 
   describe('profile info', () => {
     it('correctly fills profile info', async () => {
@@ -60,108 +51,108 @@ describe('articleMeta component', () => {
 
       const imageProfileLink = wrapper.getComponent<typeof RouterLink>('[data-test="image-profile-link"]')
       const usernameProfileLink = wrapper.getComponent<typeof RouterLink>('[data-test="username-profile-link"]')
-      const profileLinkToPropValue = { name: 'profile', params: { username: article.author.username } }
+      const profileLinkToPropValue = { name: RouteNames.PROFILE, params: { username: article.author.username } }
 
       expect(imageProfileLink.props('to')).toEqual(profileLinkToPropValue)
       expect(imageProfileLink.get('img').attributes('src')).toBe(article.author.image)
       expect(usernameProfileLink.props('to')).toEqual(profileLinkToPropValue)
       expect(usernameProfileLink.text()).toBe(article.author.username)
-      expect(getByTestId('article-date')?.text()).toBe(article.createdAt)
-      expect((getByTestId('hidden-username-input')?.element as HTMLInputElement).value).toBe(article.author.username)
+      expect(getByTestId('article-date').text()).toBe(article.createdAt)
+      expect((getByTestId('hidden-username-input').element as HTMLInputElement).value).toBe(article.author.username)
     })
   })
 
   describe('"Edit profile" button', () => {
     it('hides edit profile button with author = currentUser', async () => {
-      wrapper = createWrapper({ article })
+      wrapper = createWrapper({ article: JSON.parse(JSON.stringify(article)) })
       await nextTick()
 
       expect(wrapper.find('[data-test="edit-article-block"]').exists()).toBeFalsy()
       expect(wrapper.find('[data-test="follow-author-block"]').exists()).toBeTruthy()
-      expect(getByTestId('author-follow-button')?.attributes('class')).toContain('btn-secondary')
+      expect(getByTestId('author-follow-button').attributes('class')).toContain('btn-secondary')
     })
     it('shows edit profile button with author != currentUser', async () => {
-      wrapper = createWrapper({ article: { ...article, author: user } })
+      wrapper = createWrapper({ article: { ...JSON.parse(JSON.stringify(article)), author: user } })
       await nextTick()
 
       expect(wrapper.find('[data-test="edit-article-block"]').exists()).toBeTruthy()
       expect(wrapper.find('[data-test="follow-author-block"]').exists()).toBeFalsy()
-      expect(wrapper.getComponent<typeof RouterLink>('[data-test="edit-article-link"]').props('to')).toEqual({ name: 'editor', params: { slug: article.slug } })
+      expect(wrapper.getComponent<typeof RouterLink>('[data-test="edit-article-link"]').props('to')).toEqual({ name: RouteNames.EDITOR, params: { slug: article.slug } })
     })
   })
 
   describe('"(Un)Follow author" button', () => {
     it('shows follow button with subscription and emits right event by click', async () => {
-      wrapper = createWrapper({ article })
+      wrapper = createWrapper({ article: JSON.parse(JSON.stringify(article)) })
       await nextTick()
 
-      expect(getByTestId('author-follow-button')?.attributes('class')).toContain('btn-secondary')
-      expect(getByTestId('author-follow-button')?.attributes('class')).not.toContain('btn-outline-secondary')
-      expect(getByTestId('author-follow-button')?.text()).not.toContain('Follow')
-      expect(getByTestId('author-follow-button')?.text()).toContain('Unfollow')
-      expect(getByTestId('author-follow-button')?.text()).toContain(article.author.username)
-      expect(getByTestId('author-favorite-button')?.attributes('class')).toContain('btn-primary')
-      expect(getByTestId('author-favorite-button')?.attributes('class')).not.toContain('btn-outline-primary')
-      expect(getByTestId('author-favorite-button')?.text()).not.toContain('Favorite')
-      expect(getByTestId('author-favorite-button')?.text()).toContain('Unfavorite')
-      expect(getByTestId('article-favorites-count')?.text()).toBe(`(${article.favoritesCount})`)
+      expect(getByTestId('author-follow-button').attributes('class')).toContain('btn-secondary')
+      expect(getByTestId('author-follow-button').attributes('class')).not.toContain('btn-outline-secondary')
+      expect(getByTestId('author-follow-button').text()).not.toContain('Follow')
+      expect(getByTestId('author-follow-button').text()).toContain('Unfollow')
+      expect(getByTestId('author-follow-button').text()).toContain(article.author.username)
+      expect(getByTestId('author-favorite-button').attributes('class')).toContain('btn-primary')
+      expect(getByTestId('author-favorite-button').attributes('class')).not.toContain('btn-outline-primary')
+      expect(getByTestId('author-favorite-button').text()).not.toContain('Favorite')
+      expect(getByTestId('author-favorite-button').text()).toContain('Unfavorite')
+      expect(getByTestId('article-favorites-count').text()).toBe(`(${article.favoritesCount})`)
 
-      await getByTestId('author-follow-button')?.trigger('click')
+      await getByTestId('author-follow-button').trigger('click')
       expect(wrapper.emitted('followedAuthor')![0]![0]).toBe(false)
     })
     it('shows unfollow button without subscription and emits right event by click', async () => {
-      wrapper = createWrapper({ article: { ...article, favorited: false, author: { ...article.author, following: false } } })
+      wrapper = createWrapper({ article: { ...JSON.parse(JSON.stringify(article)), favorited: false, author: { ...article.author, following: false } } })
       await nextTick()
 
-      expect(getByTestId('author-follow-button')?.attributes('class')).not.toContain('btn-secondary')
-      expect(getByTestId('author-follow-button')?.attributes('class')).toContain('btn-outline-secondary')
-      expect(getByTestId('author-follow-button')?.text()).toContain('Follow')
-      expect(getByTestId('author-follow-button')?.text()).not.toContain('Unfollow')
-      expect(getByTestId('author-favorite-button')?.attributes('class')).not.toContain('btn-primary')
-      expect(getByTestId('author-favorite-button')?.attributes('class')).toContain('btn-outline-primary')
-      expect(getByTestId('author-favorite-button')?.text()).toContain('Favorite')
-      expect(getByTestId('author-favorite-button')?.text()).not.toContain('Unfavorite')
-      expect(getByTestId('article-favorites-count')?.text()).toBe(`(${article.favoritesCount})`)
+      expect(getByTestId('author-follow-button').attributes('class')).not.toContain('btn-secondary')
+      expect(getByTestId('author-follow-button').attributes('class')).toContain('btn-outline-secondary')
+      expect(getByTestId('author-follow-button').text()).toContain('Follow')
+      expect(getByTestId('author-follow-button').text()).not.toContain('Unfollow')
+      expect(getByTestId('author-favorite-button').attributes('class')).not.toContain('btn-primary')
+      expect(getByTestId('author-favorite-button').attributes('class')).toContain('btn-outline-primary')
+      expect(getByTestId('author-favorite-button').text()).toContain('Favorite')
+      expect(getByTestId('author-favorite-button').text()).not.toContain('Unfavorite')
+      expect(getByTestId('article-favorites-count').text()).toBe(`(${article.favoritesCount})`)
 
-      await getByTestId('author-follow-button')?.trigger('click')
+      await getByTestId('author-follow-button').trigger('click')
       expect(wrapper.emitted('followedAuthor')![0]![0]).toBe(true)
     })
   })
 
   describe('"Favorite post" button', () => {
     it('shows favorite post button with article favorited and emits right event by click', async () => {
-      wrapper = createWrapper({ article })
+      wrapper = createWrapper({ article: JSON.parse(JSON.stringify(article)) })
       await nextTick()
 
-      expect(getByTestId('author-follow-button')?.attributes('class')).toContain('btn-secondary')
-      expect(getByTestId('author-follow-button')?.attributes('class')).not.toContain('btn-outline-secondary')
-      expect(getByTestId('author-follow-button')?.text()).not.toContain('Follow')
-      expect(getByTestId('author-follow-button')?.text()).toContain('Unfollow')
-      expect(getByTestId('author-follow-button')?.text()).toContain(article.author.username)
-      expect(getByTestId('author-favorite-button')?.attributes('class')).toContain('btn-primary')
-      expect(getByTestId('author-favorite-button')?.attributes('class')).not.toContain('btn-outline-primary')
-      expect(getByTestId('author-favorite-button')?.text()).not.toContain('Favorite')
-      expect(getByTestId('author-favorite-button')?.text()).toContain('Unfavorite')
-      expect(getByTestId('article-favorites-count')?.text()).toBe(`(${article.favoritesCount})`)
+      expect(getByTestId('author-follow-button').attributes('class')).toContain('btn-secondary')
+      expect(getByTestId('author-follow-button').attributes('class')).not.toContain('btn-outline-secondary')
+      expect(getByTestId('author-follow-button').text()).not.toContain('Follow')
+      expect(getByTestId('author-follow-button').text()).toContain('Unfollow')
+      expect(getByTestId('author-follow-button').text()).toContain(article.author.username)
+      expect(getByTestId('author-favorite-button').attributes('class')).toContain('btn-primary')
+      expect(getByTestId('author-favorite-button').attributes('class')).not.toContain('btn-outline-primary')
+      expect(getByTestId('author-favorite-button').text()).not.toContain('Favorite')
+      expect(getByTestId('author-favorite-button').text()).toContain('Unfavorite')
+      expect(getByTestId('article-favorites-count').text()).toBe(`(${article.favoritesCount})`)
 
-      await getByTestId('author-favorite-button')?.trigger('click')
+      await getByTestId('author-favorite-button').trigger('click')
       expect(wrapper.emitted('favoritedArticle')![0]![0]).toBe(false)
     })
     it('shows unfavorite post button without article favorited and emits right event by click', async () => {
-      wrapper = createWrapper({ article: { ...article, favorited: false, author: { ...article.author, following: false } } })
+      wrapper = createWrapper({ article: { ...JSON.parse(JSON.stringify(article)), favorited: false, author: { ...article.author, following: false } } })
       await nextTick()
 
-      expect(getByTestId('author-follow-button')?.attributes('class')).not.toContain('btn-secondary')
-      expect(getByTestId('author-follow-button')?.attributes('class')).toContain('btn-outline-secondary')
-      expect(getByTestId('author-follow-button')?.text()).toContain('Follow')
-      expect(getByTestId('author-follow-button')?.text()).not.toContain('Unfollow')
-      expect(getByTestId('author-favorite-button')?.attributes('class')).not.toContain('btn-primary')
-      expect(getByTestId('author-favorite-button')?.attributes('class')).toContain('btn-outline-primary')
-      expect(getByTestId('author-favorite-button')?.text()).toContain('Favorite')
-      expect(getByTestId('author-favorite-button')?.text()).not.toContain('Unfavorite')
-      expect(getByTestId('article-favorites-count')?.text()).toBe(`(${article.favoritesCount})`)
+      expect(getByTestId('author-follow-button').attributes('class')).not.toContain('btn-secondary')
+      expect(getByTestId('author-follow-button').attributes('class')).toContain('btn-outline-secondary')
+      expect(getByTestId('author-follow-button').text()).toContain('Follow')
+      expect(getByTestId('author-follow-button').text()).not.toContain('Unfollow')
+      expect(getByTestId('author-favorite-button').attributes('class')).not.toContain('btn-primary')
+      expect(getByTestId('author-favorite-button').attributes('class')).toContain('btn-outline-primary')
+      expect(getByTestId('author-favorite-button').text()).toContain('Favorite')
+      expect(getByTestId('author-favorite-button').text()).not.toContain('Unfavorite')
+      expect(getByTestId('article-favorites-count').text()).toBe(`(${article.favoritesCount})`)
 
-      await getByTestId('author-favorite-button')?.trigger('click')
+      await getByTestId('author-favorite-button').trigger('click')
       expect(wrapper.emitted('favoritedArticle')![0]![0]).toBe(true)
     })
   })

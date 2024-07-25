@@ -1,9 +1,11 @@
 import axios from 'axios'
 import router from '../routes/_index'
-import { backendBaseUrl } from '@/shared/config'
+import { RouteNames } from '../routes'
+import { AUTH_REQUIRED_URLS, BASE_URL } from '@/shared/config'
+import { getUserToken } from '@/shared/utils'
 
 const api = axios.create({
-  baseURL: backendBaseUrl,
+  baseURL: BASE_URL,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -12,21 +14,12 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    let token = ''
-    const user = localStorage.getItem('user')
+    const token = getUserToken()
+    const isAuthRequiredUrl = AUTH_REQUIRED_URLS.some(url => config.url?.includes(url))
+    const isAuthRequired = isAuthRequiredUrl && !token
 
-    if (user) {
-      token = JSON.parse(user).token
-    }
-    const authRequiredUrls = [
-      '/favorite',
-      '/follow',
-    ]
-    const isAuthRequired = authRequiredUrls.some(url => config.url?.includes(url))
-
-    if (isAuthRequired && !token) {
-      sessionStorage.removeItem('user')
-      router.push({ name: 'login' })
+    if (isAuthRequired) {
+      router.push({ name: RouteNames.LOGIN })
       return Promise.reject(new Error('No token available'))
     }
     return config

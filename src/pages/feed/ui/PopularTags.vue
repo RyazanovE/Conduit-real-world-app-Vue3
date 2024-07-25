@@ -2,6 +2,7 @@
 import { useRoute } from 'vue-router'
 import { feedApiService } from '@/shared/api'
 import { useFetch } from '@/shared/hooks'
+import { RouteNames } from '@/app/routes'
 
 const route = useRoute()
 
@@ -15,7 +16,7 @@ const { result: tagsResult } = useFetch(feedApiService.getTags)
       <router-link
         v-for="tag in tagsResult?.data?.tags"
         :key="tag"
-        :to="{ name: 'feed', query: { ...route.query, source: undefined, tag, page: 1 } }"
+        :to="{ name: RouteNames.FEED, query: { ...route.query, source: undefined, tag, page: 1 } }"
         class="tag-pill tag-default"
         data-test="popular-tag"
       >
