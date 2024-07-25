@@ -5,7 +5,7 @@ import type { RouterLink } from 'vue-router'
 import { nextTick } from 'vue'
 import ArticleMeta from '../ui/ArticleMeta.vue'
 import { clearLocalStorage, mockLocalStorage, user } from '@/../vitest.setup.ts'
-import { article } from '@/features/article-preview/tests/constants'
+import { article } from '@/shared/test/constants'
 
 const push = vitest.fn()
 

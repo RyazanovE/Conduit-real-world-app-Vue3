@@ -43,3 +43,10 @@ export const anotherArticle: Article = {
     following: false,
   },
 }
+
+export const mockProfileData = {
+  username: '2311232131333fdd',
+  bio: 'some-bio',
+  image: 'https://api.realworld.io/images/smiley-cyrus.jpeg',
+  following: false,
+}

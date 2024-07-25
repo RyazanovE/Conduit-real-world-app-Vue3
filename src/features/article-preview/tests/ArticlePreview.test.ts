@@ -3,7 +3,7 @@ import { mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vitest } from 'vitest'
 import type { RouterLink } from 'vue-router'
 import ArticlePreview from '../ui/ArticlePreview.vue'
-import { anotherArticle, article } from './constants'
+import { anotherArticle, article } from '../../../shared/test/constants'
 import { api } from '@/app/api/_index'
 import { authFetchOptions, clearLocalStorage, mockLocalStorage } from '@/../vitest.setup.ts'
 

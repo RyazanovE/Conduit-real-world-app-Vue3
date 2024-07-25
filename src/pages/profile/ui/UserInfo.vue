@@ -12,7 +12,6 @@ const emits = defineEmits<{
 }>()
 
 const router = useRouter()
-
 const { currentUser, route } = useUserSession()
 
 const isMyProfile = computed(() => {
@@ -46,13 +45,16 @@ async function toggleFollow() {
     <div class="container">
       <div class="row">
         <div class="col-xs-12 col-md-10 offset-md-1">
-          <img :src="props.user.image" class="user-img">
-          <h4>{{ props.user.username }}</h4>
-          <p>
+          <img data-test="user-image" :src="props.user.image" class="user-img">
+          <h4 data-test="username-header">
+            {{ props.user.username }}
+          </h4>
+          <p data-test="bio-paragraph">
             {{ props.user.bio }}
           </p>
           <button
             v-if="isMyProfile"
+            data-test="edit-profile-button"
             class="btn btn-sm btn-outline-secondary action-btn"
             @click="router.push({ name: 'settings' })"
           >
@@ -61,6 +63,7 @@ async function toggleFollow() {
           </button>
           <button
             v-else
+            data-test="follow-button"
             class="btn btn-sm btn-outline-secondary action-btn"
             @click="toggleFollow"
           >
