@@ -56,7 +56,7 @@ describe('settings component', () => {
   })
   it('showing validation error with uncorrect formFields', async () => {
     vitest.spyOn(console, 'error').mockImplementation(() => { })
-    vitest.spyOn(api, 'put').mockResolvedValue({
+    const put = vitest.spyOn(api, 'put').mockResolvedValue({
       data: { user: { email: 'some-email', username: 'some-username' } },
       status: 200,
     })
@@ -89,13 +89,13 @@ describe('settings component', () => {
     expect(wrapper.findAll('[data-test="error-message"]')).toHaveLength(2)
     expect(wrapper.findAll('[data-test="error-message"]').map(el => el.text())).toEqual(errorMessages)
 
-    expect(api.put).not.toHaveBeenCalled()
+    expect(put).not.toHaveBeenCalled()
 
     onSubmit({ email: 'some-email', username: 'some-username' })
     await flushPromises()
     expect(wrapper.findAll('[data-test="error-message"]')).toHaveLength(0)
-    expect(api.put).toHaveBeenCalledOnce()
-    expect(api.put).toHaveBeenCalledWith('/user/', { user: { email: 'some-email', username: 'some-username' } }, authFetchOptions)
+    expect(put).toHaveBeenCalledOnce()
+    expect(put).toHaveBeenCalledWith('/user/', { user: { email: 'some-email', username: 'some-username' } }, authFetchOptions)
     expect(pushMock).toHaveBeenCalledOnce()
     expect(pushMock).toHaveBeenCalledWith({ name: 'profile', params: { username: 'some-username' } })
     expect(JSON.parse(localStorage.getItem('user') ?? '')).toEqual({ email: 'some-email', username: 'some-username' })

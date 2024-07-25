@@ -7,6 +7,7 @@ import FeedPage from '../ui/FeedPage.vue'
 import { anotherArticle, article } from '@/shared/test/constants'
 import { api } from '@/app/api/_index'
 import type { Article } from '@/shared/models'
+import { RoutePaths } from '@/app/routes'
 
 let wrapper: VueWrapper<any> | null
 let router: Router | null
@@ -56,16 +57,16 @@ describe('feedPage component', () => {
     const tag = 'some-tag'
     const page = 2
 
-    vi.spyOn(api, 'get').mockResolvedValue({
+    const get = vi.spyOn(api, 'get').mockResolvedValue({
       status: 200,
       data: { articles: mockArticles, articlesCount: mockArticles.length },
     })
 
-    router = await createRealRouter([{ path: '/', component: FeedPage }], { page, tag, source: 'my-feed' })
+    router = await createRealRouter([{ path: RoutePaths.FEED, component: FeedPage }], { page, tag, source: 'my-feed' })
     wrapper = createWrapper()
 
-    expect(api.get).toHaveBeenCalledOnce()
-    expect(api.get).toHaveBeenCalledWith('/articles/feed', getPayloadToCheck(page, tag))
+    expect(get).toHaveBeenCalledOnce()
+    expect(get).toHaveBeenCalledWith('/articles/feed', getPayloadToCheck(page, tag))
     await flushPromises()
 
     const articles = wrapper.findAllComponents({ name: 'ArticlePreview' })
@@ -83,15 +84,15 @@ describe('feedPage component', () => {
     const tag = 'some-tag'
     const page = 2
 
-    vi.spyOn(api, 'get').mockRejectedValue({
+    const get = vi.spyOn(api, 'get').mockRejectedValue({
       status: 500,
     })
 
-    router = await createRealRouter([{ path: '/', component: FeedPage }], { page, tag, source: 'my-feed' })
+    router = await createRealRouter([{ path: RoutePaths.FEED, component: FeedPage }], { page, tag, source: 'my-feed' })
     wrapper = createWrapper()
 
-    expect(api.get).toHaveBeenCalledOnce()
-    expect(api.get).toHaveBeenCalledWith('/articles/feed', getPayloadToCheck(page, tag))
+    expect(get).toHaveBeenCalledOnce()
+    expect(get).toHaveBeenCalledWith('/articles/feed', getPayloadToCheck(page, tag))
     await flushPromises()
 
     const articles = wrapper.findAllComponents({ name: 'ArticlePreview' })
@@ -104,26 +105,25 @@ describe('feedPage component', () => {
   })
 
   it('calls updateArticles when route query parameters change', async () => {
+    const get = vi.spyOn(api, 'get').mockResolvedValue({
+      status: 200,
+      data: { articles: mockArticles, articlesCount: mockArticles.length },
+    })
     let page = 1
     let tag = 'tag'
     let source: string | undefined
 
     async function updateRoute(calledTimes: number, page: number, tag: string, source?: string) {
       if (router) {
-        router.push({ path: '/', query: { page, tag, source } })
+        router.push({ path: RoutePaths.FEED, query: { page, tag, source } })
         await router.isReady()
         await flushPromises()
-        expect(api.get).toHaveBeenCalledTimes(calledTimes)
-        expect(api.get).toHaveBeenCalledWith('/articles', getPayloadToCheck(page, tag))
+        expect(get).toHaveBeenCalledTimes(calledTimes)
+        expect(get).toHaveBeenCalledWith('/articles', getPayloadToCheck(page, tag))
       }
     }
 
-    vi.spyOn(api, 'get').mockResolvedValue({
-      status: 200,
-      data: { articles: mockArticles, articlesCount: mockArticles.length },
-    })
-
-    router = await createRealRouter([{ path: '/', component: FeedPage }], { page, tag })
+    router = await createRealRouter([{ path: RoutePaths.FEED, component: FeedPage }], { page, tag })
     createWrapper()
 
     await flushPromises()
@@ -149,11 +149,11 @@ describe('feedPage component', () => {
       data: { articles: mockArticles, articlesCount: mockArticles.length },
     })
 
-    router = await createRealRouter([{ path: '/', component: FeedPage }], {})
+    router = await createRealRouter([{ path: RoutePaths.FEED, component: FeedPage }], {})
     wrapper = createWrapper()
 
     await flushPromises()
-    const { toggleFavorite } = wrapper.vm as any
+    const { toggleFavorite } = wrapper.vm
 
     toggleFavorite({ slug: mockArticles[0].slug, favorited: false })
     toggleFavorite({ slug: mockArticles[1].slug, favorited: true })

@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import type { ProfileResponse } from '../models'
 import { useUserSession } from '@/shared/hooks'
 import { articleReadService } from '@/shared/api'
+import { RouteNames } from '@/app/routes'
 
 const props = defineProps<{ user: ProfileResponse['profile'] }>()
 
@@ -56,7 +57,7 @@ async function toggleFollow() {
             v-if="isMyProfile"
             data-test="edit-profile-button"
             class="btn btn-sm btn-outline-secondary action-btn"
-            @click="router.push({ name: 'settings' })"
+            @click="router.push({ name: RouteNames.SETTINGS })"
           >
             <i class="ion-gear-a" />
             &nbsp; Edit Profile Settings

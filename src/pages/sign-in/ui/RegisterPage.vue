@@ -3,6 +3,7 @@ import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { signInService } from '../api'
 import { useFetch, useUserSession } from '@/shared/hooks'
+import { RouteNames } from '@/app/routes'
 
 const formFields = [
   { name: 'username', placeholder: 'Username', type: 'text' },
@@ -27,7 +28,7 @@ async function onSubmit(_e: Event) {
 
   if (!isError.value && user) {
     setUser(user)
-    router.push({ name: 'feed' })
+    router.push({ name: RouteNames.FEED })
   }
 }
 </script>
@@ -41,7 +42,7 @@ async function onSubmit(_e: Event) {
             Sign up
           </h1>
           <p className="text-xs-center">
-            <router-link :to="{ name: 'login' }">
+            <router-link :to="{ name: RouteNames.LOGIN }">
               Have an account?
             </router-link>
           </p>

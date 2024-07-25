@@ -1,16 +1,32 @@
 import type { VueWrapper } from '@vue/test-utils'
-import { mount } from '@vue/test-utils'
+import { shallowMount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vitest } from 'vitest'
 import type { RouterLink } from 'vue-router'
 import ArticlePreview from '../ui/ArticlePreview.vue'
 import { anotherArticle, article } from '../../../shared/test/constants'
-import { api } from '@/app/api/_index'
+import { api } from '@/app/api'
 import { authFetchOptions, clearLocalStorage, mockLocalStorage } from '@/../vitest.setup.ts'
+import { RouteNames } from '@/app/routes'
+import { routerLinkStub } from '@/shared/test'
+
+let wrapper: VueWrapper<any> | null
+
+function createWrapper() {
+  return shallowMount(ArticlePreview, {
+    props: { article: JSON.parse(JSON.stringify(article)) },
+    global: {
+      stubs: {
+        ...routerLinkStub,
+      },
+    },
+  })
+}
+
+const getByTestId = (testId: string) => (wrapper as VueWrapper<any>).get(`[data-test="${testId}"]`)
 
 describe('articlePreview Component', () => {
-  let wrapper: VueWrapper<any> | null
-
   beforeEach(() => {
+    wrapper = createWrapper()
     mockLocalStorage()
   })
 
@@ -20,98 +36,72 @@ describe('articlePreview Component', () => {
     clearLocalStorage()
   })
 
-  function createWrapper() {
-    return mount(ArticlePreview, {
-      props: { article },
-      global: {
-        stubs: {
-          'router-link': {
-            template: '<a data-test="img-profile-link" :href="to"><slot></slot></a>',
-            props: ['to'],
-          },
-        },
-      },
-    })
-  }
+  it('renders button with correct class based on favorited state', () => {
+    expect(getByTestId('button-favorite')?.classes()).toContain(article.favorited ? 'btn-primary' : 'btn-outline-primary')
+  })
 
-  const getByTestId = (testId: string) => wrapper?.get(`[data-test="${testId}"]`)
+  it('router-links have correct :to attribute', () => {
+    const imgProfileLink = wrapper!.getComponent<typeof RouterLink>('[data-test=\'img-profile-link\']')
+    const usernameProfileLink = wrapper!.getComponent<typeof RouterLink>('[data-test=\'author-username-link\']')
+    const articleProfileLink = wrapper!.getComponent<typeof RouterLink>('[data-test=\'article-profile-link\']')
+
+    expect(imgProfileLink.props().to).toEqual({ name: RouteNames.PROFILE, params: { username: article.author.username } })
+    expect(usernameProfileLink.props().to).toEqual({ name: RouteNames.PROFILE, params: { username: article.author.username } })
+    expect(articleProfileLink.props().to).toEqual({ name: RouteNames.ARTICLE, params: { slug: article.slug } })
+  })
 
   describe('article props rendering', () => {
     it('correctly updates props interpolation', async () => {
-      wrapper = createWrapper()
-      expect(getByTestId('article-date')?.text()).toEqual(new Date(article.createdAt).toLocaleDateString(undefined, {
+      expect(getByTestId('article-date').text()).toEqual(new Date(article.createdAt).toLocaleDateString(undefined, {
         dateStyle: 'long',
       }))
-      expect(getByTestId('author-image')?.attributes().src).toEqual(article.author.image)
-      expect(getByTestId('author-username-link')?.text()).toEqual(article.author.username)
-      expect(getByTestId('article-title')?.text()).toEqual(article.title)
-      expect(getByTestId('article-description')?.text()).toEqual(article.description)
-      expect(getByTestId('tag-list')?.findAll('li').map(tag => tag.text())).toEqual(article.tagList)
-      expect(getByTestId('button-favorite')?.text()).toEqual(article.favoritesCount.toString())
+      expect(getByTestId('author-image').attributes().src).toEqual(article.author.image)
+      expect(getByTestId('author-username-link').text()).toEqual(article.author.username)
+      expect(getByTestId('article-title').text()).toEqual(article.title)
+      expect(getByTestId('article-description').text()).toEqual(article.description)
+      expect(getByTestId('tag-list').findAll('li').map(tag => tag.text())).toEqual(article.tagList)
+      expect(getByTestId('button-favorite').text()).toEqual(article.favoritesCount.toString())
 
-      await wrapper.setProps({ article: anotherArticle })
+      await wrapper!.setProps({ article: JSON.parse(JSON.stringify(anotherArticle)) })
 
-      expect(getByTestId('article-date')?.text()).toEqual(new Date(anotherArticle.createdAt).toLocaleDateString(undefined, {
+      expect(getByTestId('article-date').text()).toEqual(new Date(anotherArticle.createdAt).toLocaleDateString(undefined, {
         dateStyle: 'long',
       }))
-      expect(getByTestId('author-image')?.attributes().src).toEqual(anotherArticle.author.image)
-      expect(getByTestId('author-username-link')?.text()).toEqual(anotherArticle.author.username)
-      expect(getByTestId('article-title')?.text()).toEqual(anotherArticle.title)
-      expect(getByTestId('article-description')?.text()).toEqual(anotherArticle.description)
-      expect(getByTestId('tag-list')?.findAll('li').map(tag => tag.text())).toEqual(anotherArticle.tagList)
-      expect(getByTestId('button-favorite')?.text()).toEqual(anotherArticle.favoritesCount.toString())
-    })
-  })
-
-  describe('button Rendering', () => {
-    it('renders button with correct class based on favorited state', () => {
-      wrapper = createWrapper()
-      const button = getByTestId('button-favorite')
-      expect(button?.classes()).toContain(article.favorited ? 'btn-primary' : 'btn-outline-primary')
-    })
-  })
-
-  describe('router-links', () => {
-    it('have correct :to attribute', () => {
-      wrapper = createWrapper()
-      const imgProfileLink = wrapper.getComponent<typeof RouterLink>('[data-test=\'img-profile-link\']')
-      const usernameProfileLink = wrapper.getComponent<typeof RouterLink>('[data-test=\'author-username-link\']')
-      const articleProfileLink = wrapper.getComponent<typeof RouterLink>('[data-test=\'article-profile-link\']')
-
-      expect(imgProfileLink.props().to).toEqual({ name: 'profile', params: { username: article.author.username } })
-      expect(usernameProfileLink.props().to).toEqual({ name: 'profile', params: { username: article.author.username } })
-      expect(articleProfileLink.props().to).toEqual({ name: 'article', params: { slug: article.slug } })
+      expect(getByTestId('author-image').attributes().src).toEqual(anotherArticle.author.image)
+      expect(getByTestId('author-username-link').text()).toEqual(anotherArticle.author.username)
+      expect(getByTestId('article-title').text()).toEqual(anotherArticle.title)
+      expect(getByTestId('article-description').text()).toEqual(anotherArticle.description)
+      expect(getByTestId('tag-list').findAll('li').map(tag => tag.text())).toEqual(anotherArticle.tagList)
+      expect(getByTestId('button-favorite').text()).toEqual(anotherArticle.favoritesCount.toString())
     })
   })
 
   describe('handling /favorite DELETE Request', () => {
     it('sends correct DELETE request on button click and emits event', async () => {
-      wrapper = createWrapper()
-      vitest.spyOn(api, 'delete').mockResolvedValue({
-        data: { ...article, favorited: !article.favorited },
+      const deleteMethod = vitest.spyOn(api, 'delete').mockResolvedValue({
+        data: { ...JSON.parse(JSON.stringify(article)), favorited: !article.favorited },
         status: 200,
       })
 
-      await getByTestId('button-favorite')?.trigger('submit')
+      await getByTestId('button-favorite').trigger('submit')
 
-      expect(api.delete).toHaveBeenCalledTimes(1)
-      expect(api.delete).toHaveBeenCalledWith(`/articles/${article.slug}/favorite`, authFetchOptions)
-      expect(wrapper.emitted().favorited).toEqual([[{ slug: article.slug, favorited: !article.favorited }]])
+      expect(deleteMethod).toHaveBeenCalledTimes(1)
+      expect(deleteMethod).toHaveBeenCalledWith(`/articles/${article.slug}/favorite`, authFetchOptions)
+      expect(wrapper!.emitted().favorited).toEqual([[{ slug: article.slug, favorited: !article.favorited }]])
     })
 
     it('restores favorite state on incorrect DELETE response and emits event', async () => {
-      wrapper = createWrapper()
       vitest.spyOn(console, 'error').mockImplementation(() => { })
-      vitest.spyOn(api, 'delete').mockRejectedValue({
+      const deleteMethod = vitest.spyOn(api, 'delete').mockRejectedValue({
         data: null,
         status: 500,
       })
 
-      await getByTestId('button-favorite')?.trigger('submit')
+      await getByTestId('button-favorite').trigger('submit')
 
-      expect(api.delete).toHaveBeenCalledTimes(1)
-      expect(api.delete).toHaveBeenCalledWith(`/articles/${article.slug}/favorite`, authFetchOptions)
-      expect(wrapper.emitted().favorited).toEqual([
+      expect(deleteMethod).toHaveBeenCalledTimes(1)
+      expect(deleteMethod).toHaveBeenCalledWith(`/articles/${article.slug}/favorite`, authFetchOptions)
+      expect(wrapper!.emitted().favorited).toEqual([
         [{ slug: article.slug, favorited: !article.favorited }],
         [{ slug: article.slug, favorited: article.favorited }],
       ])
@@ -120,36 +110,33 @@ describe('articlePreview Component', () => {
 
   describe('handling /favorite POST Request', () => {
     it('sends correct POST request on button click and emits event', async () => {
-      wrapper = createWrapper()
-      await wrapper.setProps({ article: anotherArticle })
-
-      vitest.spyOn(api, 'post').mockResolvedValue({
-        data: { ...anotherArticle, favorited: !anotherArticle.favorited },
+      const post = vitest.spyOn(api, 'post').mockResolvedValue({
+        data: { ...JSON.parse(JSON.stringify(anotherArticle)), favorited: !anotherArticle.favorited },
         status: 200,
       })
 
-      await getByTestId('button-favorite')?.trigger('submit')
+      await wrapper!.setProps({ article: JSON.parse(JSON.stringify(anotherArticle)) })
+      await getByTestId('button-favorite').trigger('submit')
 
-      expect(api.post).toHaveBeenCalledTimes(1)
-      expect(api.post).toHaveBeenCalledWith(`/articles/${anotherArticle.slug}/favorite`, undefined, authFetchOptions)
-      expect(wrapper.emitted().favorited).toEqual([[{ slug: anotherArticle.slug, favorited: !anotherArticle.favorited }]])
+      expect(post).toHaveBeenCalledTimes(1)
+      expect(post).toHaveBeenCalledWith(`/articles/${anotherArticle.slug}/favorite`, undefined, authFetchOptions)
+      expect(wrapper!.emitted().favorited).toEqual([[{ slug: anotherArticle.slug, favorited: !anotherArticle.favorited }]])
     })
 
     it('restores favorite state on incorrect POST response and emits event', async () => {
-      wrapper = createWrapper()
       vitest.spyOn(console, 'error').mockImplementation(() => { })
-      await wrapper?.setProps({ article: anotherArticle })
+      await wrapper?.setProps({ article: JSON.parse(JSON.stringify(anotherArticle)) })
 
-      vitest.spyOn(api, 'post').mockRejectedValue({
+      const post = vitest.spyOn(api, 'post').mockRejectedValue({
         data: null,
         status: 500,
       })
 
-      await getByTestId('button-favorite')?.trigger('submit')
+      await getByTestId('button-favorite').trigger('submit')
 
-      expect(api.post).toHaveBeenCalledTimes(1)
-      expect(api.post).toHaveBeenCalledWith(`/articles/${anotherArticle.slug}/favorite`, undefined, authFetchOptions)
-      expect(wrapper.emitted().favorited).toEqual([
+      expect(post).toHaveBeenCalledTimes(1)
+      expect(post).toHaveBeenCalledWith(`/articles/${anotherArticle.slug}/favorite`, undefined, authFetchOptions)
+      expect(wrapper!.emitted().favorited).toEqual([
         [{ slug: anotherArticle.slug, favorited: !anotherArticle.favorited }],
         [{ slug: anotherArticle.slug, favorited: anotherArticle.favorited }],
       ])

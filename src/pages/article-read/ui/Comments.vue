@@ -2,6 +2,7 @@
 import { onMounted, ref } from 'vue'
 import { articleReadService } from '@/shared/api'
 import { useFetch, useUserSession } from '@/shared/hooks'
+import { RouteNames } from '@/app/routes/index'
 
 const commentText = ref('')
 
@@ -14,11 +15,9 @@ onMounted(() => {
 
 async function deleteComment(id: number) {
   try {
-    const { status } = await articleReadService.deleteArticleComments(String(route.params.slug), id)
+    await articleReadService.deleteArticleComments(String(route.params.slug), id)
 
-    if (status === 200) {
-      fetchData(String(route.params.slug))
-    }
+    fetchData(String(route.params.slug))
   }
   catch (error) {
     console.error(error)
@@ -27,11 +26,9 @@ async function deleteComment(id: number) {
 
 async function postComment() {
   try {
-    const { status } = await articleReadService.createArticleComments(String(route.params.slug), commentText.value)
+    await articleReadService.createArticleComments(String(route.params.slug), commentText.value)
 
-    if (status === 200) {
-      fetchData(String(route.params.slug))
-    }
+    fetchData(String(route.params.slug))
   }
   catch (error) {
     console.error(error)
@@ -73,11 +70,11 @@ async function postComment() {
     <div v-else data-test="empty-current-user-row" class="row">
       <div class="col-xs-12 col-md-8 offset-md-2">
         <p>
-          <router-link :to="{ name: 'login' }">
+          <router-link :to="{ name: RouteNames.LOGIN }">
             Sign in
           </router-link>
           &nbsp; or &nbsp;
-          <router-link :to="{ name: 'register' }">
+          <router-link :to="{ name: RouteNames.REGISTER }">
             Sign up
           </router-link>
           &nbsp; to add comments on this article.
@@ -94,7 +91,7 @@ async function postComment() {
 
       <div class="card-footer">
         <router-link
-          :to="{ name: 'profile', params: { username: comment.author.username } }"
+          :to="{ name: RouteNames.PROFILE, params: { username: comment.author.username } }"
           class="comment-author"
           data-test="comment-author-image-link"
         >
@@ -107,7 +104,7 @@ async function postComment() {
         </router-link>
         &nbsp;
         <router-link
-          :to="{ name: 'profile', params: { username: comment.author.username } }"
+          :to="{ name: RouteNames.PROFILE, params: { username: comment.author.username } }"
           class="comment-author"
           data-test="comment-author-username-link"
         >

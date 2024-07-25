@@ -1,5 +1,9 @@
 <script setup lang="ts">
-const props = defineProps<{ errors: string[] }>()
+interface FormErrorsProps {
+  errors: string[]
+}
+
+const props = defineProps<FormErrorsProps>()
 </script>
 
 <template>

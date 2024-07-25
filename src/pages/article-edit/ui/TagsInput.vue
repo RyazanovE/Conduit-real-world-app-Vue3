@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-interface Props {
+interface TagsInputProps {
   tags?: string[]
 }
 
-const props = defineProps<Props>()
+const props = defineProps<TagsInputProps>()
 const emits = defineEmits(['update:tags'])
 
 const tagsInputValue = computed(() => props.tags?.join(',') ?? '')

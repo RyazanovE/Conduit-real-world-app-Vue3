@@ -10,6 +10,7 @@ import { anotherArticle, article, mockProfileData } from '@/shared/test/constant
 import { api } from '@/app/api/_index'
 import type { Article } from '@/shared/models'
 import { authFetchOptions, clearLocalStorage, mockLocalStorage, user } from '@/../vitest.setup'
+import { RouteNames, RoutePaths } from '@/app/routes'
 
 let wrapper: VueWrapper<any> | null
 let router: Router | null
@@ -53,7 +54,7 @@ describe('profile component', () => {
       return { status: 200, data }
     })
 
-    router = await createRealRouter([{ name: 'profile', path: '/profile/:username', component: Profile }], undefined, { username: user.username })
+    router = await createRealRouter([{ name: RouteNames.PROFILE, path: '/profile/:username', component: Profile }], undefined, { username: user.username })
     wrapper = createWrapper()
     await flushPromises()
 
@@ -82,7 +83,7 @@ describe('profile component', () => {
   it('renders empty list of articles with rejected response', async () => {
     const get = vi.spyOn(api, 'get').mockRejectedValue({ status: 500 })
 
-    router = await createRealRouter([{ name: 'profile', path: '/profile/:username', component: Profile }], undefined, { username: user.username })
+    router = await createRealRouter([{ name: RouteNames.PROFILE, path: RoutePaths.PROFILE, component: Profile }], undefined, { username: user.username })
     wrapper = createWrapper()
     await flushPromises()
     const paramsToCheck = {
@@ -117,7 +118,7 @@ describe('profile component', () => {
       return { status: 200, data }
     })
 
-    router = await createRealRouter([{ name: 'profile', path: '/profile/:username', component: Profile }], undefined, { username: user.username })
+    router = await createRealRouter([{ name: RouteNames.PROFILE, path: RoutePaths.PROFILE, component: Profile }], undefined, { username: user.username })
     wrapper = createWrapper()
     await flushPromises()
 
@@ -131,14 +132,14 @@ describe('profile component', () => {
     expect(articlesFetch).toHaveBeenCalledTimes(1)
     expect(articlesFetch).toHaveBeenNthCalledWith(1, `/articles`, paramsToCheck)
 
-    router.push({ name: 'profile', params: { username: paramsToCheck.author } })
+    router.push({ name: RouteNames.PROFILE, params: { username: paramsToCheck.author } })
     await router.isReady()
     await flushPromises()
     expect(articlesFetch).toHaveBeenCalledTimes(2)
     expect(articlesFetch).toHaveBeenNthCalledWith(2, `/articles`, paramsToCheck)
 
     paramsToCheck.offset = 20
-    router.push({ name: 'profile', params: { username: paramsToCheck.author }, query: { page: 2 } })
+    router.push({ name: RouteNames.PROFILE, params: { username: paramsToCheck.author }, query: { page: 2 } })
     await router.isReady()
     await flushPromises()
     expect(articlesFetch).toHaveBeenCalledTimes(3)
@@ -155,7 +156,7 @@ describe('profile component', () => {
       return { status: 200, data }
     })
 
-    router = await createRealRouter([{ name: 'profile', path: '/profile/:username', component: Profile }], undefined, { username: user.username })
+    router = await createRealRouter([{ name: RouteNames.PROFILE, path: RoutePaths.PROFILE, component: Profile }], undefined, { username: user.username })
     wrapper = createWrapper()
     await flushPromises()
     const { onAuthorFollowed, onFavorited } = wrapper.vm

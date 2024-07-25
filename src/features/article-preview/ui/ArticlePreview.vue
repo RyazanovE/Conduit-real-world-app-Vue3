@@ -1,20 +1,18 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { RouteNames } from '@/app/routes'
 import type { Article } from '@/shared/models'
 import { feedApiService } from '@/shared/api'
 
 interface ArticlePreviewProps {
   article: Article
 }
+
 const props = defineProps<ArticlePreviewProps>()
-const emits = defineEmits<{
-  (e: 'favorited', payload: { slug: string, favorited: boolean }): void
-}>()
+const emits = defineEmits<{ (e: 'favorited', payload: { slug: string, favorited: boolean }): void }>()
 
 const formattedDate = computed(() => {
-  return new Date(props.article.createdAt).toLocaleDateString(undefined, {
-    dateStyle: 'long',
-  })
+  return new Date(props.article.createdAt).toLocaleDateString(undefined, { dateStyle: 'long' })
 })
 
 function emitFavourited(favorited: boolean) {
@@ -42,12 +40,12 @@ async function onFavourite() {
 <template>
   <div class="article-preview">
     <div class="article-meta">
-      <router-link data-test="img-profile-link" :to="{ name: 'profile', params: { username: props.article.author.username } }">
+      <router-link data-test="img-profile-link" :to="{ name: RouteNames.PROFILE, params: { username: props.article.author.username } }">
         <img data-test="author-image" :src="props.article.author.image" alt="">
       </router-link>
       <div class="info">
         <router-link
-          :to="{ name: 'profile', params: { username: props.article.author.username } }"
+          :to="{ name: RouteNames.PROFILE, params: { username: props.article.author.username } }"
           data-test="author-username-link"
           class="author"
         >
@@ -68,7 +66,7 @@ async function onFavourite() {
       </form>
     </div>
     <router-link
-      :to="{ name: 'article', params: { slug: props.article.slug } }"
+      :to="{ name: RouteNames.ARTICLE, params: { slug: props.article.slug } }"
       class="preview-link"
       data-test="article-profile-link"
     >
