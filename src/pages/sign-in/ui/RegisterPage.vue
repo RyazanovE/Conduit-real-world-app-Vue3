@@ -2,6 +2,7 @@
 import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { signInService } from '../api'
+import AuthForm from './AuthForm.vue'
 import { useFetch, useUserSession } from '@/shared/hooks'
 import { RouteNames } from '@/app/routes'
 
@@ -31,62 +32,19 @@ async function onSubmit(_e: Event) {
     router.push({ name: RouteNames.FEED })
   }
 }
+
+function onFormValueChange(name: keyof typeof formValues, value: string) {
+  formValues[name] = value
+}
 </script>
 
 <template>
-  <div className="auth-page">
-    <div className="container page">
-      <div className="row">
-        <div className="col-md-6 offset-md-3 col-xs-12">
-          <h1 className="text-xs-center">
-            Sign up
-          </h1>
-          <p className="text-xs-center">
-            <router-link :to="{ name: RouteNames.LOGIN }">
-              Have an account?
-            </router-link>
-          </p>
-
-          <template v-if="isError">
-            <ul
-              v-if="typeof (error?.response?.data) === 'object'"
-              className="error-messages"
-            >
-              <li
-                v-for="(key, value) of (error.response?.data as Record<string, string>)?.errors"
-                :key="value"
-              >
-                {{ value }}: {{ key }}
-              </li>
-            </ul>
-            <p
-              v-else
-              className="error-messages"
-            >
-              {{ error?.response?.data }}
-            </p>
-          </template>
-
-          <form @submit.prevent="onSubmit">
-            <fieldset
-              v-for="({ name, placeholder, type }, i) of formFields"
-              :key="i"
-              className="form-group"
-            >
-              <input
-                v-model="formValues[name as keyof typeof formValues]"
-                className="form-control form-control-lg"
-                :type
-                :name
-                :placeholder
-              >
-            </fieldset>
-            <button className="btn btn-lg btn-primary pull-xs-right">
-              Sign up
-            </button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
+  <AuthForm
+    :form-fields="formFields"
+    :form-values="formValues"
+    :is-error="isError"
+    :error="error"
+    @submit="onSubmit"
+    @form-value-change="onFormValueChange"
+  />
 </template>
