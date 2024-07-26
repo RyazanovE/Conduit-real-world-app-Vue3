@@ -1,5 +1,5 @@
 import type { VueWrapper } from '@vue/test-utils'
-import { flushPromises, mount, shallowMount } from '@vue/test-utils'
+import { flushPromises, shallowMount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vitest } from 'vitest'
 import type { RouterLink } from 'vue-router'
 import Comments from '../ui/Comments.vue'
