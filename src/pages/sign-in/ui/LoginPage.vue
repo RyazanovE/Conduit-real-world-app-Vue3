@@ -38,6 +38,7 @@ function onFormValueChange(name: keyof typeof formValues, value: string) {
 
 <template>
   <AuthForm
+    sing-in
     :form-fields="formFields"
     :form-values="formValues"
     :is-error="isError"

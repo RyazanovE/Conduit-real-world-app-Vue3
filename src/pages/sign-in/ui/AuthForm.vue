@@ -14,6 +14,7 @@ interface AuthFormProps {
   }
   isError: boolean
   error: AxiosError<unknown, any> | null
+  singIn?: boolean
 }
 
 const props = defineProps<AuthFormProps>()
@@ -26,7 +27,7 @@ defineEmits(['sumbit', 'formValueChange'])
       <div class="row">
         <div class="col-md-6 offset-md-3 col-xs-12">
           <h1 class="text-xs-center">
-            Sign in
+            {{ props.singIn ? "Sign in" : "Sign out" }}
           </h1>
           <p class="text-xs-center">
             <router-link :to="{ name: RouteNames.REGISTER }">
