@@ -2,7 +2,9 @@
 import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { signInService } from '../api'
+import AuthForm from './AuthForm.vue'
 import { useFetch, useUserSession } from '@/shared/hooks'
+import { RouteNames } from '@/app/routes'
 
 const formFields = [
   { name: 'email', placeholder: 'Email', type: 'email' },
@@ -25,65 +27,22 @@ async function onSubmit(_e: Event) {
 
   if (!isError.value && user) {
     setUser(user)
-    router.push({ name: 'feed' })
+    router.push({ name: RouteNames.FEED })
   }
+}
+
+function onFormValueChange(name: keyof typeof formValues, value: string) {
+  formValues[name] = value
 }
 </script>
 
 <template>
-  <div class="auth-page">
-    <div class="container page">
-      <div class="row">
-        <div class="col-md-6 offset-md-3 col-xs-12">
-          <h1 class="text-xs-center">
-            Sign in
-          </h1>
-          <p class="text-xs-center">
-            <router-link :to="{ name: 'register' }">
-              Need an account?
-            </router-link>
-          </p>
-
-          <template v-if="isError">
-            <ul
-              v-if="typeof (error?.response?.data) === 'object'"
-              className="error-messages"
-            >
-              <li
-                v-for="(key, value) of (error.response?.data as Record<string, string>)?.errors"
-                :key="value"
-              >
-                {{ value }}: {{ key }}
-              </li>
-            </ul>
-            <p
-              v-else
-              className="error-messages"
-            >
-              {{ error?.response?.data }}
-            </p>
-          </template>
-
-          <form @submit.prevent="onSubmit">
-            <fieldset
-              v-for="({ name, placeholder, type }, i) in formFields"
-              :key="i"
-              class="form-group"
-            >
-              <input
-                v-model="formValues[name as keyof typeof formValues]"
-                class="form-control form-control-lg"
-                :type="type"
-                :name="name"
-                :placeholder="placeholder"
-              >
-            </fieldset>
-            <button class="btn btn-lg btn-primary pull-xs-right">
-              Sign in
-            </button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
+  <AuthForm
+    :form-fields="formFields"
+    :form-values="formValues"
+    :is-error="isError"
+    :error="error"
+    @submit="onSubmit"
+    @form-value-change="onFormValueChange"
+  />
 </template>
